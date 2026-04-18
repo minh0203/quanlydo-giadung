@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CustomerManagement</class>
+ <widget class="QWidget" name="CustomerManagement">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Quản lý khách hàng</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget { background-color: #f5f7fa; }
+    QTableWidget { background-color: white; }
+    QHeaderView::section { background-color: #9b59b6; color: white; padding: 10px; }
+    QPushButton { border-radius: 6px; padding: 8px 15px; }
+    QPushButton#btnAdd { background-color: #27ae60; color: white; }
+    QPushButton#btnEdit { background-color: #3498db; color: white; }
+    QPushButton#btnDelete { background-color: #e74c3c; color: white; }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>👥 QUẢN LÝ KHÁCH HÀNG</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="searchLayout">
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>Tìm kiếm khách hàng...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>🔍 Tìm</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>➕ Thêm khách hàng</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableCustomers">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Mã KH</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tên khách hàng</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Điện thoại</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Email</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Địa chỉ</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Điểm tích lũy</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

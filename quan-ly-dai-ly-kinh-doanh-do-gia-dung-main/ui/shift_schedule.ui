@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ShiftSchedule</class>
+ <widget class="QWidget" name="ShiftSchedule">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1300</width>
+    <height>850</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Phân ca làm việc</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #f5f7fa;
+    }
+    QGroupBox {
+        font-weight: bold;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        background-color: white;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 15px;
+        padding: 0 8px 0 8px;
+        color: #2c3e50;
+    }
+    QTableWidget {
+        background-color: white;
+        gridline-color: #e0e0e0;
+        selection-background-color: #3498db;
+        selection-color: white;
+        border-radius: 10px;
+    }
+    QHeaderView::section {
+        background-color: #3498db;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    QPushButton {
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: bold;
+    }
+    QPushButton#btnSaveSchedule {
+        background-color: #27ae60;
+        color: white;
+    }
+    QPushButton#btnSaveSchedule:hover {
+        background-color: #2ecc71;
+    }
+    QPushButton#btnCopyWeek {
+        background-color: #3498db;
+        color: white;
+    }
+    QPushButton#btnClearSchedule {
+        background-color: #e74c3c;
+        color: white;
+    }
+    QPushButton#btnExportSchedule {
+        background-color: #9b59b6;
+        color: white;
+    }
+    QComboBox, QDateEdit {
+        padding: 8px 12px;
+        border: 1px solid #dcdfe6;
+        border-radius: 8px;
+        background-color: white;
+        font-size: 13px;
+    }
+    QLabel {
+        color: #2c3e50;
+    }
+    QTabWidget::pane {
+        border: 1px solid #e1e8ed;
+        border-radius: 10px;
+        background-color: white;
+    }
+    QTabBar::tab {
+        background-color: #ecf0f1;
+        padding: 10px 25px;
+        margin-right: 3px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    QTabBar::tab:selected {
+        background-color: #3498db;
+        color: white;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>📅 PHÂN CA LÀM VIỆC</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="controlLayout">
+     <item>
+      <widget class="QLabel" name="lblMonth">
+       <property name="text">
+        <string>Chọn tháng:</string>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="dateMonth">
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="displayFormat">
+        <string>MM/yyyy</string>
+       </property>
+       <property name="date">
+        <date>
+         <year>2026</year>
+         <month>4</month>
+         <day>1</day>
+        </date>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLoadSchedule">
+       <property name="text">
+        <string>📅 Tải lịch</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCopyWeek">
+       <property name="text">
+        <string>📋 Copy tuần</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSaveSchedule">
+       <property name="text">
+        <string>💾 Lưu lịch</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClearSchedule">
+       <property name="text">
+        <string>🗑️ Xóa lịch</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportSchedule">
+       <property name="text">
+        <string>📊 Xuất Excel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabGridView">
+      <attribute name="title">
+       <string>📊 Lịch phân ca</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTableWidget" name="tableSchedule">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::DoubleClicked</set>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>true</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabEmployeeView">
+      <attribute name="title">
+       <string>👨‍💼 Lịch theo nhân viên</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="employeeSelectLayout">
+         <item>
+          <widget class="QLabel" name="lblEmployee">
+           <property name="text">
+            <string>Chọn nhân viên:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cboEmployee">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnViewEmployeeSchedule">
+           <property name="text">
+            <string>👁️ Xem lịch</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="tableEmployeeSchedule">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxLegend">
+     <property name="title">
+      <string>Chú thích</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="lblMorning">
+        <property name="text">
+         <string>🟢 Ca sáng (08:00 - 12:00)</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #27ae60; font-weight: bold;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblAfternoon">
+        <property name="text">
+         <string>🟡 Ca chiều (13:00 - 17:00)</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #f39c12; font-weight: bold;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblEvening">
+        <property name="text">
+         <string>🔴 Ca tối (18:00 - 22:00)</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #e74c3c; font-weight: bold;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblOff">
+        <property name="text">
+         <string>⚪ Nghỉ</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #95a5a6; font-weight: bold;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

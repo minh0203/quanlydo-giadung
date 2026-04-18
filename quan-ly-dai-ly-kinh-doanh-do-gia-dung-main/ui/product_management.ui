@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProductManagement</class>
+ <widget class="QWidget" name="ProductManagement">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Quản lý sản phẩm</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget { background-color: #f5f7fa; }
+    QTableWidget { background-color: white; alternate-background-color: #f9f9f9; }
+    QHeaderView::section { background-color: #3498db; color: white; padding: 10px; }
+    QPushButton { border-radius: 6px; padding: 8px 15px; font-weight: bold; }
+    QPushButton#btnAdd { background-color: #27ae60; color: white; }
+    QPushButton#btnEdit { background-color: #3498db; color: white; }
+    QPushButton#btnDelete { background-color: #e74c3c; color: white; }
+    QLineEdit, QComboBox { padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>📦 QUẢN LÝ SẢN PHẨM</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="searchLayout">
+     <item>
+      <widget class="QLabel" name="lblSearch">
+       <property name="text">
+        <string>Tìm kiếm:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtSearch">
+       <property name="placeholderText">
+        <string>Tìm theo mã, tên sản phẩm...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSearch">
+       <property name="text">
+        <string>🔍 Tìm</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cboCategory">
+       <item>
+        <property name="text">
+         <string>Tất cả danh mục</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Tủ lạnh</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Máy giặt</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>TV</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Điều hòa</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>➕ Thêm sản phẩm</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableProducts">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Mã SP</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tên sản phẩm</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Danh mục</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Giá bán</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tồn kho</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Trạng thái</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

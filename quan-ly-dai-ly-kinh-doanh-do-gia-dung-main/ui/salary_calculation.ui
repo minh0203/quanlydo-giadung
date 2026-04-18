@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SalaryCalculation</class>
+ <widget class="QWidget" name="SalaryCalculation">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Tính lương nhân viên</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #f5f7fa;
+    }
+    QGroupBox {
+        font-weight: bold;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        background-color: white;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 15px;
+        padding: 0 8px 0 8px;
+        color: #2c3e50;
+    }
+    QTableWidget {
+        background-color: white;
+        alternate-background-color: #f9f9f9;
+        gridline-color: #e0e0e0;
+        selection-background-color: #3498db;
+        selection-color: white;
+        border-radius: 10px;
+    }
+    QHeaderView::section {
+        background-color: #3498db;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+    }
+    QPushButton {
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: bold;
+    }
+    QPushButton#btnCalculate {
+        background-color: #27ae60;
+        color: white;
+        font-size: 14px;
+    }
+    QPushButton#btnCalculate:hover {
+        background-color: #2ecc71;
+    }
+    QPushButton#btnExportSalary {
+        background-color: #9b59b6;
+        color: white;
+    }
+    QPushButton#btnPrintSalary {
+        background-color: #3498db;
+        color: white;
+    }
+    QPushButton#btnConfirmPayment {
+        background-color: #f39c12;
+        color: white;
+    }
+    QComboBox, QDateEdit, QLineEdit {
+        padding: 8px 12px;
+        border: 1px solid #dcdfe6;
+        border-radius: 8px;
+        background-color: white;
+        font-size: 13px;
+    }
+    QLabel {
+        color: #2c3e50;
+    }
+    QLabel#lblTotalSalary {
+        font-size: 24px;
+        font-weight: bold;
+        color: #e74c3c;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>💰 TÍNH LƯƠNG NHÂN VIÊN</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>18</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="controlLayout">
+     <item>
+      <widget class="QLabel" name="lblMonth">
+       <property name="text">
+        <string>Tháng tính lương:</string>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateEdit" name="dateSalaryMonth">
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="displayFormat">
+        <string>MM/yyyy</string>
+       </property>
+       <property name="date">
+        <date>
+         <year>2026</year>
+         <month>4</month>
+         <day>1</day>
+        </date>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCalculate">
+       <property name="text">
+        <string>🔄 Tính lương</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportSalary">
+       <property name="text">
+        <string>📊 Xuất Excel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPrintSalary">
+       <property name="text">
+        <string>🖨️ In bảng lương</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableSalary">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Mã NV</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Họ tên</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Lương CB</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Doanh số</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Hoa hồng</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thưởng</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Phụ cấp</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tạm ứng</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>BHXH</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thuế TNCN</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Thực lĩnh</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Trạng thái</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="summaryLayout">
+     <item>
+      <widget class="QGroupBox" name="groupBoxSummary">
+       <property name="title">
+        <string>Tổng hợp lương tháng</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="lblTotalEmployees">
+          <property name="text">
+           <string>Tổng số nhân viên:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lblTotalEmployeesValue">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="lblTotalBaseSalary">
+          <property name="text">
+           <string>Tổng lương cơ bản:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="lblTotalBaseSalaryValue">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="lblTotalCommission">
+          <property name="text">
+           <string>Tổng hoa hồng:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="lblTotalCommissionValue">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="lblTotalAllowance">
+          <property name="text">
+           <string>Tổng phụ cấp:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="lblTotalAllowanceValue">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="lblTotalBonus">
+          <property name="text">
+           <string>Tổng thưởng:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="lblTotalBonusValue">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="lblTotalSalary">
+          <property name="text">
+           <string>TỔNG THỰC LĨNH:</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="lblTotalSalaryValue">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size: 18px; font-weight: bold; color: #e74c3c;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="actionLayout">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnConfirmPayment">
+       <property name="text">
+        <string>💰 Xác nhận đã trả lương</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPrintPayslip">
+       <property name="text">
+        <string>🖨️ In phiếu lương</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>

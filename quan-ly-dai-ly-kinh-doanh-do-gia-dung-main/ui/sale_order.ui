@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SaleOrder</class>
+ <widget class="QWidget" name="SaleOrder">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1300</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Bán hàng</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget { background-color: #f5f7fa; }
+    QGroupBox { font-weight: bold; border: 2px solid #ddd; border-radius: 10px; margin-top: 10px; padding-top: 10px; background-color: white; }
+    QTableWidget { background-color: white; }
+    QHeaderView::section { background-color: #e67e22; color: white; padding: 10px; }
+    QPushButton { border-radius: 6px; padding: 10px 20px; font-weight: bold; }
+    QPushButton#btnAddToCart { background-color: #3498db; color: white; }
+    QPushButton#btnCheckout { background-color: #27ae60; color: white; font-size: 16px; }
+    QPushButton#btnClearCart { background-color: #e74c3c; color: white; }
+    QLineEdit, QComboBox { padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+    QLabel#lblTotal { font-size: 20px; font-weight: bold; color: #e74c3c; }
+   </string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBoxProducts">
+     <property name="title">
+      <string>📦 Danh sách sản phẩm</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="productSearchLayout">
+        <item>
+         <widget class="QLineEdit" name="txtProductSearch">
+          <property name="placeholderText">
+           <string>Tìm kiếm sản phẩm...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnSearchProduct">
+          <property name="text">
+           <string>🔍 Tìm</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tableProducts"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxCart">
+     <property name="title">
+      <string>🛒 Giỏ hàng</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QTableWidget" name="tableCart"/>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Tổng tiền:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lblTotal">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Thuế VAT (10%):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="lblVAT">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Thành tiền:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="lblGrandTotal">
+          <property name="text">
+           <string>0 VNĐ</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size: 18px; font-weight: bold; color: #e74c3c;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="cartButtonLayout">
+        <item>
+         <widget class="QPushButton" name="btnAddToCart">
+          <property name="text">
+           <string>➕ Thêm vào giỏ</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnRemoveFromCart">
+          <property name="text">
+           <string>❌ Xóa khỏi giỏ</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnClearCart">
+          <property name="text">
+           <string>🗑️ Xóa giỏ hàng</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCheckout">
+        <property name="text">
+         <string>💳 THANH TOÁN</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

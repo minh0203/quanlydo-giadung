@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ProductManagement(object):
     def setupUi(self, ProductManagement):
         ProductManagement.setObjectName("ProductManagement")
-        ProductManagement.resize(1400, 900)
+        ProductManagement.resize(1400, 950)
         ProductManagement.setStyleSheet("\n"
 "    QWidget {\n"
 "        background-color: #f0f2f5;\n"
@@ -32,6 +32,7 @@ class Ui_ProductManagement(object):
 "        left: 15px;\n"
 "        padding: 0 8px 0 8px;\n"
 "        color: #2c3e50;\n"
+"        font-size: 14px;\n"
 "    }\n"
 "    QTableWidget {\n"
 "        background-color: white;\n"
@@ -46,14 +47,16 @@ class Ui_ProductManagement(object):
 "        color: white;\n"
 "        padding: 12px;\n"
 "        font-weight: bold;\n"
-"        font-size: 13px;\n"
+"        font-size: 14px;\n"
 "        border: none;\n"
 "    }\n"
 "    QPushButton {\n"
 "        border-radius: 8px;\n"
-"        padding: 8px 18px;\n"
+"        padding: 12px 28px;\n"
 "        font-weight: bold;\n"
-"        font-size: 13px;\n"
+"        font-size: 18px;\n"
+"        min-width: 140px;\n"
+"        min-height: 50px;\n"
 "    }\n"
 "    QPushButton#btnAdd {\n"
 "        background-color: #27ae60;\n"
@@ -89,21 +92,24 @@ class Ui_ProductManagement(object):
 "        color: white;\n"
 "    }\n"
 "    QLineEdit, QComboBox, QTextEdit {\n"
-"        padding: 8px 12px;\n"
+"        padding: 16px 18px;\n"
 "        border: 1px solid #dcdfe6;\n"
 "        border-radius: 8px;\n"
 "        background-color: white;\n"
-"        font-size: 13px;\n"
+"        font-size: 20px;\n"
+"        min-height: 45px;\n"
 "    }\n"
 "    QLineEdit:focus, QComboBox:focus {\n"
 "        border-color: #3498db;\n"
+"        border: 2px solid #3498db;\n"
 "        outline: none;\n"
 "    }\n"
 "    QLabel {\n"
 "        color: #2c3e50;\n"
+"        font-size: 13px;\n"
 "    }\n"
 "    QLabel#lblTitle {\n"
-"        font-size: 22px;\n"
+"        font-size: 24px;\n"
 "        font-weight: bold;\n"
 "        color: #2c3e50;\n"
 "    }\n"
@@ -119,19 +125,31 @@ class Ui_ProductManagement(object):
         self.searchLayout = QtWidgets.QHBoxLayout(self.groupBoxSearch)
         self.searchLayout.setObjectName("searchLayout")
         self.lblSearch = QtWidgets.QLabel(self.groupBoxSearch)
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblSearch.setFont(font)
         self.lblSearch.setObjectName("lblSearch")
         self.searchLayout.addWidget(self.lblSearch)
         self.txtSearch = QtWidgets.QLineEdit(self.groupBoxSearch)
-        self.txtSearch.setMinimumSize(QtCore.QSize(300, 0))
+        self.txtSearch.setMinimumSize(QtCore.QSize(350, 35))
         self.txtSearch.setObjectName("txtSearch")
         self.searchLayout.addWidget(self.txtSearch)
         self.btnSearch = QtWidgets.QPushButton(self.groupBoxSearch)
+        self.btnSearch.setMinimumSize(QtCore.QSize(110, 40))
         self.btnSearch.setObjectName("btnSearch")
         self.searchLayout.addWidget(self.btnSearch)
         self.lblCategory = QtWidgets.QLabel(self.groupBoxSearch)
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lblCategory.setFont(font)
         self.lblCategory.setObjectName("lblCategory")
         self.searchLayout.addWidget(self.lblCategory)
         self.cboCategory = QtWidgets.QComboBox(self.groupBoxSearch)
+        self.cboCategory.setMinimumSize(QtCore.QSize(150, 35))
         self.cboCategory.setObjectName("cboCategory")
         self.cboCategory.addItem("")
         self.cboCategory.addItem("")
@@ -145,6 +163,7 @@ class Ui_ProductManagement(object):
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.searchLayout.addItem(spacerItem)
         self.btnAdd = QtWidgets.QPushButton(self.groupBoxSearch)
+        self.btnAdd.setMinimumSize(QtCore.QSize(140, 45))
         self.btnAdd.setObjectName("btnAdd")
         self.searchLayout.addWidget(self.btnAdd)
         self.verticalLayout.addWidget(self.groupBoxSearch)
@@ -156,6 +175,7 @@ class Ui_ProductManagement(object):
         self.tableProducts.setAlternatingRowColors(True)
         self.tableProducts.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableProducts.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableProducts.setMinimumSize(QtCore.QSize(0, 300))
         self.tableProducts.setObjectName("tableProducts")
         self.tableProducts.setColumnCount(9)
         self.tableProducts.setRowCount(0)
@@ -185,32 +205,38 @@ class Ui_ProductManagement(object):
         self.gridLayout.setObjectName("gridLayout")
         self.lblProductCode = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblProductCode.setFont(font)
         self.lblProductCode.setObjectName("lblProductCode")
         self.gridLayout.addWidget(self.lblProductCode, 0, 0, 1, 1)
         self.txtProductCode = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtProductCode.setMinimumSize(QtCore.QSize(200, 35))
         self.txtProductCode.setObjectName("txtProductCode")
         self.gridLayout.addWidget(self.txtProductCode, 0, 1, 1, 1)
         self.lblProductName = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblProductName.setFont(font)
         self.lblProductName.setObjectName("lblProductName")
         self.gridLayout.addWidget(self.lblProductName, 0, 2, 1, 1)
         self.txtProductName = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtProductName.setMinimumSize(QtCore.QSize(250, 35))
         self.txtProductName.setObjectName("txtProductName")
         self.gridLayout.addWidget(self.txtProductName, 0, 3, 1, 1)
         self.lblCategoryForm = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblCategoryForm.setFont(font)
         self.lblCategoryForm.setObjectName("lblCategoryForm")
         self.gridLayout.addWidget(self.lblCategoryForm, 1, 0, 1, 1)
         self.cboProductCategory = QtWidgets.QComboBox(self.groupBoxProductForm)
+        self.cboProductCategory.setMinimumSize(QtCore.QSize(200, 35))
         self.cboProductCategory.setObjectName("cboProductCategory")
         self.cboProductCategory.addItem("")
         self.cboProductCategory.addItem("")
@@ -222,52 +248,62 @@ class Ui_ProductManagement(object):
         self.gridLayout.addWidget(self.cboProductCategory, 1, 1, 1, 1)
         self.lblBrand = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblBrand.setFont(font)
         self.lblBrand.setObjectName("lblBrand")
         self.gridLayout.addWidget(self.lblBrand, 1, 2, 1, 1)
         self.txtBrand = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtBrand.setMinimumSize(QtCore.QSize(250, 35))
         self.txtBrand.setObjectName("txtBrand")
         self.gridLayout.addWidget(self.txtBrand, 1, 3, 1, 1)
         self.lblPurchasePrice = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblPurchasePrice.setFont(font)
         self.lblPurchasePrice.setObjectName("lblPurchasePrice")
         self.gridLayout.addWidget(self.lblPurchasePrice, 2, 0, 1, 1)
         self.txtPurchasePrice = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtPurchasePrice.setMinimumSize(QtCore.QSize(200, 35))
         self.txtPurchasePrice.setObjectName("txtPurchasePrice")
         self.gridLayout.addWidget(self.txtPurchasePrice, 2, 1, 1, 1)
         self.lblSellingPrice = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblSellingPrice.setFont(font)
         self.lblSellingPrice.setObjectName("lblSellingPrice")
         self.gridLayout.addWidget(self.lblSellingPrice, 2, 2, 1, 1)
         self.txtSellingPrice = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtSellingPrice.setMinimumSize(QtCore.QSize(250, 35))
         self.txtSellingPrice.setObjectName("txtSellingPrice")
         self.gridLayout.addWidget(self.txtSellingPrice, 2, 3, 1, 1)
         self.lblQuantity = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblQuantity.setFont(font)
         self.lblQuantity.setObjectName("lblQuantity")
         self.gridLayout.addWidget(self.lblQuantity, 3, 0, 1, 1)
         self.txtQuantity = QtWidgets.QLineEdit(self.groupBoxProductForm)
+        self.txtQuantity.setMinimumSize(QtCore.QSize(200, 35))
         self.txtQuantity.setObjectName("txtQuantity")
         self.gridLayout.addWidget(self.txtQuantity, 3, 1, 1, 1)
         self.lblUnit = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblUnit.setFont(font)
         self.lblUnit.setObjectName("lblUnit")
         self.gridLayout.addWidget(self.lblUnit, 3, 2, 1, 1)
         self.cboUnit = QtWidgets.QComboBox(self.groupBoxProductForm)
+        self.cboUnit.setMinimumSize(QtCore.QSize(120, 35))
         self.cboUnit.setObjectName("cboUnit")
         self.cboUnit.addItem("")
         self.cboUnit.addItem("")
@@ -275,13 +311,15 @@ class Ui_ProductManagement(object):
         self.gridLayout.addWidget(self.cboUnit, 3, 3, 1, 1)
         self.lblDescription = QtWidgets.QLabel(self.groupBoxProductForm)
         font = QtGui.QFont()
+        font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
         self.lblDescription.setFont(font)
         self.lblDescription.setObjectName("lblDescription")
         self.gridLayout.addWidget(self.lblDescription, 4, 0, 1, 1)
         self.txtDescription = QtWidgets.QTextEdit(self.groupBoxProductForm)
-        self.txtDescription.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.txtDescription.setMaximumSize(QtCore.QSize(16777215, 80))
+        self.txtDescription.setMinimumSize(QtCore.QSize(0, 60))
         self.txtDescription.setObjectName("txtDescription")
         self.gridLayout.addWidget(self.txtDescription, 4, 1, 1, 3)
         self.verticalLayout.addWidget(self.groupBoxProductForm)
@@ -290,19 +328,19 @@ class Ui_ProductManagement(object):
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.buttonLayout.addItem(spacerItem1)
         self.btnSave = QtWidgets.QPushButton(ProductManagement)
-        self.btnSave.setMinimumSize(QtCore.QSize(120, 35))
+        self.btnSave.setMinimumSize(QtCore.QSize(140, 45))
         self.btnSave.setObjectName("btnSave")
         self.buttonLayout.addWidget(self.btnSave)
         self.btnEdit = QtWidgets.QPushButton(ProductManagement)
-        self.btnEdit.setMinimumSize(QtCore.QSize(120, 35))
+        self.btnEdit.setMinimumSize(QtCore.QSize(140, 45))
         self.btnEdit.setObjectName("btnEdit")
         self.buttonLayout.addWidget(self.btnEdit)
         self.btnDelete = QtWidgets.QPushButton(ProductManagement)
-        self.btnDelete.setMinimumSize(QtCore.QSize(120, 35))
+        self.btnDelete.setMinimumSize(QtCore.QSize(140, 45))
         self.btnDelete.setObjectName("btnDelete")
         self.buttonLayout.addWidget(self.btnDelete)
         self.btnClear = QtWidgets.QPushButton(ProductManagement)
-        self.btnClear.setMinimumSize(QtCore.QSize(120, 35))
+        self.btnClear.setMinimumSize(QtCore.QSize(140, 45))
         self.btnClear.setObjectName("btnClear")
         self.buttonLayout.addWidget(self.btnClear)
         self.verticalLayout.addLayout(self.buttonLayout)

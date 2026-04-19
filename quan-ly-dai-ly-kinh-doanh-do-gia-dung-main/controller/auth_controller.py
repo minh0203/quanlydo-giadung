@@ -1,27 +1,21 @@
 from PyQt5.QtWidgets import QMessageBox
 
 
-class AuthController:
-    """Controller xử lý logic xác thực (đăng nhập/đăng ký)"""
+class LoginAuthController:
+    """Controller xử lý logic đăng nhập"""
     
-    def __init__(self, view, login_callback=None):
+    def __init__(self, view):
         self.view = view
-        self.login_callback = login_callback
         self.connect_signals()
     
     def connect_signals(self):
         """Kết nối các signal từ view"""
-        # Kiểm tra loại dialog
         if hasattr(self.view, 'btnLogin'):
-            # Login dialog
             self.view.btnLogin.clicked.connect(self.login)
-            self.view.btnRegister.clicked.connect(self.open_register)
+        if hasattr(self.view, 'btnRegister'):
+            self.view.btnRegister.clicked.connect(self.show_register)
+        if hasattr(self.view, 'btnExit'):
             self.view.btnExit.clicked.connect(self.view.close)
-        elif hasattr(self.view, 'btnRegister'):
-            # Register dialog
-            self.view.btnRegister.clicked.connect(self.register)
-            self.view.btnCancel.clicked.connect(self.view.close)
-            self.view.btnLogin.clicked.connect(self.back_to_login)
     
     def login(self):
         """Xử lý đăng nhập"""
@@ -29,7 +23,6 @@ class AuthController:
         password = self.view.txtPassword.text()
         
         if username and password:
-            # TODO: Kiểm tra database
             if username == "admin" and password == "admin123":
                 self.view.accept()
             else:
@@ -37,44 +30,51 @@ class AuthController:
         else:
             QMessageBox.warning(self.view, "Cảnh báo", "Vui lòng nhập tài khoản và mật khẩu!")
     
-    def open_register(self):
-        """Mở màn hình đăng ký"""
-        # Import ở đây để tránh vòng import
-        from main import RegisterDialog
-        self.register_dialog = RegisterDialog(login_callback=self.view.show)
-        self.view.hide()
-        self.register_dialog.exec()
+    def show_register(self):
+        """Hiển thị màn hình đăng ký"""
+        if hasattr(self.view, 'show_register_dialog'):
+            self.view.show_register_dialog()
+
+
+class RegisterAuthController:
+    """Controller xử lý logic đăng ký"""
+    
+    def __init__(self, view):
+        self.view = view
+        self.connect_signals()
+    
+    def connect_signals(self):
+        """Kết nối các signal từ view"""
+        if hasattr(self.view, 'btnRegister'):
+            self.view.btnRegister.clicked.connect(self.register)
+        if hasattr(self.view, 'btnCancel'):
+            self.view.btnCancel.clicked.connect(self.on_cancel)
+        if hasattr(self.view, 'btnLogin'):
+            self.view.btnLogin.clicked.connect(self.on_back_to_login)
     
     def register(self):
         """Xử lý đăng ký"""
         username = self.view.txtUsername.text().strip()
         password = self.view.txtPassword.text()
         confirm = self.view.txtConfirmPassword.text()
-        full_name = self.view.txtFullName.text().strip()
         
-        # Validation
         if not username:
             QMessageBox.warning(self.view, "Lỗi", "Vui lòng nhập tên đăng nhập!")
             return
-        
         if not password:
             QMessageBox.warning(self.view, "Lỗi", "Vui lòng nhập mật khẩu!")
             return
-        
         if password != confirm:
             QMessageBox.warning(self.view, "Lỗi", "Mật khẩu xác nhận không khớp!")
             return
         
-        if not full_name:
-            QMessageBox.warning(self.view, "Lỗi", "Vui lòng nhập họ tên!")
-            return
-        
-        # TODO: Lưu vào database
-        QMessageBox.information(self.view, "Thành công", f"Đăng ký thành công!\nChào mừng {full_name}!")
-        self.back_to_login()
+        QMessageBox.information(self.view, "Thành công", f"Đăng ký tài khoản '{username}' thành công!")
+        self.on_cancel()
     
-    def back_to_login(self):
-        """Quay lại màn hình đăng nhập"""
-        self.view.close()
-        if self.login_callback:
-            self.login_callback()
+    def on_cancel(self):
+        """Xử lý khi ấn nút Hủy"""
+        self.view.reject()
+    
+    def on_back_to_login(self):
+        """Xử lý khi ấn nút 'Đã có tài khoản đăng nhập ngay'"""
+        self.view.reject()

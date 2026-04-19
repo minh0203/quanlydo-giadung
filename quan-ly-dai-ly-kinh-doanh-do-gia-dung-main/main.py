@@ -9,7 +9,7 @@ from ui.register import Ui_RegisterDialog
 from ui.main_window import Ui_MainWindow
 
 # Import Controller
-from controller.auth_controller import AuthController
+from controller.auth_controller import LoginAuthController, RegisterAuthController
 from controller.main_controller import MainController
 
 
@@ -18,8 +18,9 @@ class RegisterDialog(QDialog, Ui_RegisterDialog):
     def __init__(self, parent=None, login_callback=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.login_callback = login_callback
         # Khởi tạo controller
-        self.controller = AuthController(self, login_callback)
+        self.controller = RegisterAuthController(self)
 
 
 class LoginDialog(QDialog, Ui_LoginDialog):
@@ -28,11 +29,18 @@ class LoginDialog(QDialog, Ui_LoginDialog):
         super().__init__()
         self.setupUi(self)
         # Khởi tạo controller
-        self.controller = AuthController(self)
+        self.controller = LoginAuthController(self)
         
         # Demo: tự động điền thông tin test
         self.txtUsername.setText("admin")
         self.txtPassword.setText("admin123")
+    
+    def show_register_dialog(self):
+        """Hiển thị dialog đăng ký"""
+        print("DEBUG: Showing register dialog...")
+        register_dialog = RegisterDialog(self)
+        register_dialog.exec()
+        print("DEBUG: Register dialog closed")
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):

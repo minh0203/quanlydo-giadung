@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1400</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,142 +15,608 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-    QWidget { background-color: #f5f7fa; }
-    QTableWidget { background-color: white; alternate-background-color: #f9f9f9; }
-    QHeaderView::section { background-color: #3498db; color: white; padding: 10px; }
-    QPushButton { border-radius: 6px; padding: 8px 15px; font-weight: bold; }
-    QPushButton#btnAdd { background-color: #27ae60; color: white; }
-    QPushButton#btnEdit { background-color: #3498db; color: white; }
-    QPushButton#btnDelete { background-color: #e74c3c; color: white; }
-    QLineEdit, QComboBox { padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+    QWidget {
+        background-color: #f0f2f5;
+    }
+    QGroupBox {
+        font-weight: bold;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        background-color: white;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 15px;
+        padding: 0 8px 0 8px;
+        color: #2c3e50;
+    }
+    QTableWidget {
+        background-color: white;
+        alternate-background-color: #f9f9f9;
+        gridline-color: #e0e0e0;
+        selection-background-color: #3498db;
+        selection-color: white;
+        border-radius: 10px;
+    }
+    QHeaderView::section {
+        background-color: #3498db;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 13px;
+        border: none;
+    }
+    QPushButton {
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    QPushButton#btnAdd {
+        background-color: #27ae60;
+        color: white;
+    }
+    QPushButton#btnAdd:hover {
+        background-color: #2ecc71;
+    }
+    QPushButton#btnEdit {
+        background-color: #3498db;
+        color: white;
+    }
+    QPushButton#btnEdit:hover {
+        background-color: #2980b9;
+    }
+    QPushButton#btnDelete {
+        background-color: #e74c3c;
+        color: white;
+    }
+    QPushButton#btnDelete:hover {
+        background-color: #c0392b;
+    }
+    QPushButton#btnSave {
+        background-color: #27ae60;
+        color: white;
+    }
+    QPushButton#btnClear {
+        background-color: #f39c12;
+        color: white;
+    }
+    QPushButton#btnSearch {
+        background-color: #9b59b6;
+        color: white;
+    }
+    QLineEdit, QComboBox, QTextEdit {
+        padding: 8px 12px;
+        border: 1px solid #dcdfe6;
+        border-radius: 8px;
+        background-color: white;
+        font-size: 13px;
+    }
+    QLineEdit:focus, QComboBox:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+    QLabel {
+        color: #2c3e50;
+    }
+    QLabel#lblTitle {
+        font-size: 22px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
    </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="lblTitle">
      <property name="text">
       <string>📦 QUẢN LÝ SẢN PHẨM</string>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>18</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
+   
+   <!-- Phần tìm kiếm và bộ lọc -->
    <item>
-    <layout class="QHBoxLayout" name="searchLayout">
+    <widget class="QGroupBox" name="groupBoxSearch">
+     <property name="title">
+      <string>🔍 Tìm kiếm &amp; Bộ lọc</string>
+     </property>
+     <layout class="QHBoxLayout" name="searchLayout">
+      <item>
+       <widget class="QLabel" name="lblSearch">
+        <property name="text">
+         <string>Tìm kiếm:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="txtSearch">
+        <property name="placeholderText">
+         <string>Tìm theo mã, tên sản phẩm...</string>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnSearch">
+        <property name="text">
+         <string>🔍 Tìm kiếm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCategory">
+        <property name="text">
+         <string>Danh mục:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cboCategory">
+        <item>
+         <property name="text">
+          <string>Tất cả danh mục</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tủ lạnh</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Máy giặt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>TV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Điều hòa</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bếp từ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Quạt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Máy hút bụi</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAdd">
+        <property name="text">
+         <string>➕ Thêm sản phẩm</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Bảng danh sách sản phẩm -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxProductList">
+     <property name="title">
+      <string>📋 Danh sách sản phẩm</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="tableProducts">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <column>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Mã SP</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tên sản phẩm</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Danh mục</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Thương hiệu</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Giá nhập</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Giá bán</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tồn kho</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Trạng thái</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Form nhập thông tin sản phẩm -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxProductForm">
+     <property name="title">
+      <string>📝 Nhập thông tin sản phẩm</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <!-- Hàng 1: Mã sản phẩm và Tên sản phẩm -->
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblProductCode">
+        <property name="text">
+         <string>Mã sản phẩm:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txtProductCode">
+        <property name="placeholderText">
+         <string>Nhập mã sản phẩm (VD: SP001)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblProductName">
+        <property name="text">
+         <string>Tên sản phẩm:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="txtProductName">
+        <property name="placeholderText">
+         <string>Nhập tên sản phẩm</string>
+        </property>
+       </widget>
+      </item>
+      
+      <!-- Hàng 2: Danh mục và Thương hiệu -->
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblCategoryForm">
+        <property name="text">
+         <string>Danh mục:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="cboProductCategory">
+        <item>
+         <property name="text">
+          <string>Tủ lạnh</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Máy giặt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>TV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Điều hòa</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bếp từ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Quạt</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Máy hút bụi</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lblBrand">
+        <property name="text">
+         <string>Thương hiệu:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="txtBrand">
+        <property name="placeholderText">
+         <string>VD: Samsung, Panasonic, Sony...</string>
+        </property>
+       </widget>
+      </item>
+      
+      <!-- Hàng 3: Giá nhập và Giá bán -->
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblPurchasePrice">
+        <property name="text">
+         <string>Giá nhập:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="txtPurchasePrice">
+        <property name="placeholderText">
+         <string>Nhập giá nhập (VNĐ)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="lblSellingPrice">
+        <property name="text">
+         <string>Giá bán:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="txtSellingPrice">
+        <property name="placeholderText">
+         <string>Nhập giá bán (VNĐ)</string>
+        </property>
+       </widget>
+      </item>
+      
+      <!-- Hàng 4: Tồn kho và Đơn vị tính -->
+      <item row="3" column="0">
+       <widget class="QLabel" name="lblQuantity">
+        <property name="text">
+         <string>Tồn kho:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="txtQuantity">
+        <property name="placeholderText">
+         <string>Nhập số lượng tồn</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="lblUnit">
+        <property name="text">
+         <string>Đơn vị tính:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QComboBox" name="cboUnit">
+        <item>
+         <property name="text">
+          <string>cái</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>chiếc</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>bộ</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      
+      <!-- Hàng 5: Mô tả -->
+      <item row="4" column="0">
+       <widget class="QLabel" name="lblDescription">
+        <property name="text">
+         <string>Mô tả:</string>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="3">
+       <widget class="QTextEdit" name="txtDescription">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>Nhập mô tả sản phẩm (tùy chọn)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   
+   <!-- Các nút chức năng -->
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
      <item>
-      <widget class="QLabel" name="lblSearch">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSave">
        <property name="text">
-        <string>Tìm kiếm:</string>
+        <string>💾 Lưu sản phẩm</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>35</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtSearch">
-       <property name="placeholderText">
-        <string>Tìm theo mã, tên sản phẩm...</string>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>✏️ Sửa sản phẩm</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>35</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnSearch">
+      <widget class="QPushButton" name="btnDelete">
        <property name="text">
-        <string>🔍 Tìm</string>
+        <string>🗑️ Xóa sản phẩm</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>35</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cboCategory">
-       <item>
-        <property name="text">
-         <string>Tất cả danh mục</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Tủ lạnh</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Máy giặt</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>TV</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Điều hòa</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <spacer/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnAdd">
+      <widget class="QPushButton" name="btnClear">
        <property name="text">
-        <string>➕ Thêm sản phẩm</string>
+        <string>🔄 Xóa form</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>35</height>
+        </size>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QTableWidget" name="tableProducts">
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>ID</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Mã SP</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Tên sản phẩm</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Danh mục</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Giá bán</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Tồn kho</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Trạng thái</string>
-      </property>
-     </column>
-    </widget>
    </item>
   </layout>
  </widget>

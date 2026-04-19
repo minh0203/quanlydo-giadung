@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>450</width>
-    <height>550</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,6 +57,13 @@
     }
     QPushButton#btnLogin:hover {
         background-color: #5a67d8;
+    }
+    QPushButton#btnRegister {
+        background-color: #27ae60;
+        color: white;
+    }
+    QPushButton#btnRegister:hover {
+        background-color: #2ecc71;
     }
     QPushButton#btnExit {
         background-color: #e74c3c;
@@ -200,6 +207,8 @@
         </property>
        </spacer>
       </item>
+      
+      <!-- Hàng nút bấm: Đăng nhập + Đăng ký -->
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -213,14 +222,54 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnRegister">
+          <property name="text">
+           <string>📝 Đăng ký</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      
+      <!-- Hàng nút Thoát riêng -->
+      <item>
+       <layout class="QHBoxLayout" name="exitLayout">
+        <item>
+         <spacer name="exitSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QPushButton" name="btnExit">
           <property name="text">
            <string>Thoát</string>
           </property>
          </widget>
         </item>
+        <item>
+         <spacer name="exitSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </item>
+      
      </layout>
     </widget>
    </item>

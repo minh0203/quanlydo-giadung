@@ -18,40 +18,74 @@
     QMainWindow {
         background-color: #f0f2f5;
     }
+    
+    /* ===== MENU BAR ===== */
     QMenuBar {
         background-color: #2c3e50;
         color: white;
-        padding: 5px;
-    }
-    QMenuBar::item:selected {
-        background-color: #34495e;
-    }
-    QMenu {
-        background-color: white;
-        color: #333;
-    }
-    QToolBar {
-        background-color: white;
-        border: none;
-        spacing: 10px;
-        padding: 10px;
-    }
-    QToolButton {
-        background-color: #3498db;
-        color: white;
-        border-radius: 8px;
-        padding: 8px 15px;
+        padding: 12px 8px;
+        font-size: 18px;
         font-weight: bold;
+        min-height: 50px;
     }
-    QToolButton:hover {
+    
+    QMenuBar::item {
+        padding: 10px 22px;
+        margin: 0 5px;
+        border-radius: 6px;
+        font-size: 17px;
+    }
+    
+    QMenuBar::item:selected {
+        background-color: #3498db;
+    }
+    
+    QMenuBar::item:pressed {
         background-color: #2980b9;
     }
+    
+    /* ===== MENU DROP DOWN - CHỮ TO HƠN ===== */
+    QMenu {
+        background-color: white;
+        color: #2c3e50;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 16px;
+    }
+    
+    QMenu::item {
+        padding: 12px 50px;
+        margin: 4px 8px;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+    
+    QMenu::item:selected {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    QMenu::separator {
+        height: 2px;
+        background-color: #ddd;
+        margin: 8px 12px;
+    }
+    
+    /* ===== STATUS BAR ===== */
     QStatusBar {
         background-color: #34495e;
         color: white;
+        font-size: 13px;
+        padding: 8px;
+    }
+    
+    QStatusBar::item {
+        border: none;
     }
    </string>
   </property>
+  
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -63,15 +97,18 @@
     </item>
    </layout>
   </widget>
+  
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>1300</width>
-     <height>26</height>
+     <height>55</height>
     </rect>
    </property>
+   
+   <!-- 📁 FILE -->
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>📁 File</string>
@@ -81,6 +118,8 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   
+   <!-- 📦 QUẢN LÝ -->
    <widget class="QMenu" name="menuManage">
     <property name="title">
      <string>📦 Quản lý</string>
@@ -89,7 +128,11 @@
     <addaction name="actionCustomers"/>
     <addaction name="actionEmployees"/>
     <addaction name="actionSuppliers"/>
+    <addaction name="separator"/>
+    <addaction name="actionAttendance"/>
    </widget>
+   
+   <!-- 🧾 BÁN HÀNG -->
    <widget class="QMenu" name="menuSale">
     <property name="title">
      <string>🧾 Bán hàng</string>
@@ -98,6 +141,8 @@
     <addaction name="actionOrderManagement"/>
     <addaction name="actionWarranty"/>
    </widget>
+   
+   <!-- 📥 NHẬP HÀNG -->
    <widget class="QMenu" name="menuImport">
     <property name="title">
      <string>📥 Nhập hàng</string>
@@ -105,6 +150,8 @@
     <addaction name="actionImportGoods"/>
     <addaction name="actionSupplierManagement"/>
    </widget>
+   
+   <!-- 📊 BÁO CÁO -->
    <widget class="QMenu" name="menuReport">
     <property name="title">
      <string>📊 Báo cáo</string>
@@ -114,6 +161,18 @@
     <addaction name="actionEmployeeSalesReport"/>
     <addaction name="actionSalaryReport"/>
    </widget>
+   
+   <!-- 👨‍💼 NHÂN SỰ -->
+   <widget class="QMenu" name="menuHR">
+    <property name="title">
+     <string>👨‍💼 Nhân sự</string>
+    </property>
+    <addaction name="actionShiftSchedule"/>
+    <addaction name="actionAttendance"/>
+    <addaction name="actionSalaryCalculation"/>
+   </widget>
+   
+   <!-- ⚙️ HỆ THỐNG -->
    <widget class="QMenu" name="menuSystem">
     <property name="title">
      <string>⚙️ Hệ thống</string>
@@ -123,6 +182,8 @@
     <addaction name="actionSettings"/>
     <addaction name="actionLogs"/>
    </widget>
+   
+   <!-- ❓ TRỢ GIÚP -->
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>❓ Trợ giúp</string>
@@ -130,33 +191,22 @@
     <addaction name="actionGuide"/>
     <addaction name="actionAbout"/>
    </widget>
+   
    <addaction name="menuFile"/>
    <addaction name="menuManage"/>
    <addaction name="menuSale"/>
    <addaction name="menuImport"/>
    <addaction name="menuReport"/>
+   <addaction name="menuHR"/>
+   <addaction name="menuSystem"/>
+   <addaction name="menuHelp"/>
   </widget>
+  
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionProducts"/>
-   <addaction name="actionCustomers"/>
-   <addaction name="actionEmployees"/>
-   <addaction name="separator"/>
-   <addaction name="actionNewOrder"/>
-   <addaction name="separator"/>
-   <addaction name="actionRevenueReport"/>
-   <addaction name="separator"/>
-   <addaction name="actionSettings"/>
-  </widget>
+  
+  <!-- ============ ACTIONS ============ -->
+  
+  <!-- File -->
   <action name="actionChangePassword">
    <property name="text">
     <string>🔐 Đổi mật khẩu</string>
@@ -171,20 +221,34 @@
    <property name="text">
     <string>❌ Thoát</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+F4</string>
+   </property>
   </action>
+  
+  <!-- Quản lý -->
   <action name="actionProducts">
    <property name="text">
     <string>📦 Sản phẩm</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="actionCustomers">
    <property name="text">
     <string>👥 Khách hàng</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="actionEmployees">
    <property name="text">
     <string>👨‍💼 Nhân viên</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionSuppliers">
@@ -192,9 +256,14 @@
     <string>🏭 Nhà cung cấp</string>
    </property>
   </action>
+  
+  <!-- Bán hàng -->
   <action name="actionNewOrder">
    <property name="text">
     <string>🛒 Hóa đơn mới</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionOrderManagement">
@@ -207,9 +276,11 @@
     <string>🔧 Quản lý bảo hành</string>
    </property>
   </action>
+  
+  <!-- Nhập hàng -->
   <action name="actionImportGoods">
    <property name="text">
-    <string>📦 Nhập kho</string>
+    <string>📥 Nhập kho</string>
    </property>
   </action>
   <action name="actionSupplierManagement">
@@ -217,6 +288,8 @@
     <string>🏭 Quản lý nhà cung cấp</string>
    </property>
   </action>
+  
+  <!-- Báo cáo -->
   <action name="actionRevenueReport">
    <property name="text">
     <string>💰 Báo cáo doanh thu</string>
@@ -224,7 +297,7 @@
   </action>
   <action name="actionInventoryReport">
    <property name="text">
-    <string>📊 Báo cáo tồn kho</string>
+    <string>📦 Báo cáo tồn kho</string>
    </property>
   </action>
   <action name="actionEmployeeSalesReport">
@@ -237,6 +310,28 @@
     <string>💵 Báo cáo lương</string>
    </property>
   </action>
+  
+  <!-- Nhân sự -->
+  <action name="actionShiftSchedule">
+   <property name="text">
+    <string>📅 Phân ca làm việc</string>
+   </property>
+  </action>
+  <action name="actionAttendance">
+   <property name="text">
+    <string>⏰ Chấm công</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionSalaryCalculation">
+   <property name="text">
+    <string>💰 Tính lương</string>
+   </property>
+  </action>
+  
+  <!-- Hệ thống -->
   <action name="actionBackup">
    <property name="text">
     <string>💾 Sao lưu dữ liệu</string>
@@ -257,9 +352,14 @@
     <string>📝 Nhật ký hệ thống</string>
    </property>
   </action>
+  
+  <!-- Trợ giúp -->
   <action name="actionGuide">
    <property name="text">
     <string>📖 Hướng dẫn sử dụng</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actionAbout">

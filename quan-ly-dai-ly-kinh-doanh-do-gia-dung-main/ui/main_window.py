@@ -19,37 +19,70 @@ class Ui_MainWindow(object):
 "    QMainWindow {\n"
 "        background-color: #f0f2f5;\n"
 "    }\n"
+"    \n"
+"    /* ===== MENU BAR ===== */\n"
 "    QMenuBar {\n"
 "        background-color: #2c3e50;\n"
 "        color: white;\n"
-"        padding: 5px;\n"
-"    }\n"
-"    QMenuBar::item:selected {\n"
-"        background-color: #34495e;\n"
-"    }\n"
-"    QMenu {\n"
-"        background-color: white;\n"
-"        color: #333;\n"
-"    }\n"
-"    QToolBar {\n"
-"        background-color: white;\n"
-"        border: none;\n"
-"        spacing: 10px;\n"
-"        padding: 10px;\n"
-"    }\n"
-"    QToolButton {\n"
-"        background-color: #3498db;\n"
-"        color: white;\n"
-"        border-radius: 8px;\n"
-"        padding: 8px 15px;\n"
+"        padding: 12px 8px;\n"
+"        font-size: 18px;\n"
 "        font-weight: bold;\n"
+"        min-height: 50px;\n"
 "    }\n"
-"    QToolButton:hover {\n"
+"    \n"
+"    QMenuBar::item {\n"
+"        padding: 10px 22px;\n"
+"        margin: 0 5px;\n"
+"        border-radius: 6px;\n"
+"        font-size: 17px;\n"
+"    }\n"
+"    \n"
+"    QMenuBar::item:selected {\n"
+"        background-color: #3498db;\n"
+"    }\n"
+"    \n"
+"    QMenuBar::item:pressed {\n"
 "        background-color: #2980b9;\n"
 "    }\n"
+"    \n"
+"    /* ===== MENU DROP DOWN - CHỮ TO HƠN ===== */\n"
+"    QMenu {\n"
+"        background-color: white;\n"
+"        color: #2c3e50;\n"
+"        border: 1px solid #ddd;\n"
+"        border-radius: 10px;\n"
+"        padding: 10px;\n"
+"        font-size: 16px;\n"
+"    }\n"
+"    \n"
+"    QMenu::item {\n"
+"        padding: 12px 50px;\n"
+"        margin: 4px 8px;\n"
+"        border-radius: 6px;\n"
+"        font-size: 16px;\n"
+"    }\n"
+"    \n"
+"    QMenu::item:selected {\n"
+"        background-color: #3498db;\n"
+"        color: white;\n"
+"    }\n"
+"    \n"
+"    QMenu::separator {\n"
+"        height: 2px;\n"
+"        background-color: #ddd;\n"
+"        margin: 8px 12px;\n"
+"    }\n"
+"    \n"
+"    /* ===== STATUS BAR ===== */\n"
 "    QStatusBar {\n"
 "        background-color: #34495e;\n"
 "        color: white;\n"
+"        font-size: 13px;\n"
+"        padding: 8px;\n"
+"    }\n"
+"    \n"
+"    QStatusBar::item {\n"
+"        border: none;\n"
 "    }\n"
 "   ")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -61,7 +94,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.stackedWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1300, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1300, 55))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -73,6 +106,8 @@ class Ui_MainWindow(object):
         self.menuImport.setObjectName("menuImport")
         self.menuReport = QtWidgets.QMenu(self.menubar)
         self.menuReport.setObjectName("menuReport")
+        self.menuHR = QtWidgets.QMenu(self.menubar)
+        self.menuHR.setObjectName("menuHR")
         self.menuSystem = QtWidgets.QMenu(self.menubar)
         self.menuSystem.setObjectName("menuSystem")
         self.menuHelp = QtWidgets.QMenu(self.menubar)
@@ -81,9 +116,6 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.toolBar = QtWidgets.QToolBar(MainWindow)
-        self.toolBar.setObjectName("toolBar")
-        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.actionChangePassword = QtWidgets.QAction(MainWindow)
         self.actionChangePassword.setObjectName("actionChangePassword")
         self.actionLogout = QtWidgets.QAction(MainWindow)
@@ -116,6 +148,12 @@ class Ui_MainWindow(object):
         self.actionEmployeeSalesReport.setObjectName("actionEmployeeSalesReport")
         self.actionSalaryReport = QtWidgets.QAction(MainWindow)
         self.actionSalaryReport.setObjectName("actionSalaryReport")
+        self.actionShiftSchedule = QtWidgets.QAction(MainWindow)
+        self.actionShiftSchedule.setObjectName("actionShiftSchedule")
+        self.actionAttendance = QtWidgets.QAction(MainWindow)
+        self.actionAttendance.setObjectName("actionAttendance")
+        self.actionSalaryCalculation = QtWidgets.QAction(MainWindow)
+        self.actionSalaryCalculation.setObjectName("actionSalaryCalculation")
         self.actionBackup = QtWidgets.QAction(MainWindow)
         self.actionBackup.setObjectName("actionBackup")
         self.actionRestore = QtWidgets.QAction(MainWindow)
@@ -138,6 +176,8 @@ class Ui_MainWindow(object):
         self.menuManage.addAction(self.actionCustomers)
         self.menuManage.addAction(self.actionEmployees)
         self.menuManage.addAction(self.actionSuppliers)
+        self.menuManage.addSeparator()
+        self.menuManage.addAction(self.actionAttendance)
         self.menuSale.addAction(self.actionNewOrder)
         self.menuSale.addAction(self.actionOrderManagement)
         self.menuSale.addAction(self.actionWarranty)
@@ -147,6 +187,9 @@ class Ui_MainWindow(object):
         self.menuReport.addAction(self.actionInventoryReport)
         self.menuReport.addAction(self.actionEmployeeSalesReport)
         self.menuReport.addAction(self.actionSalaryReport)
+        self.menuHR.addAction(self.actionShiftSchedule)
+        self.menuHR.addAction(self.actionAttendance)
+        self.menuHR.addAction(self.actionSalaryCalculation)
         self.menuSystem.addAction(self.actionBackup)
         self.menuSystem.addAction(self.actionRestore)
         self.menuSystem.addAction(self.actionSettings)
@@ -158,15 +201,9 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSale.menuAction())
         self.menubar.addAction(self.menuImport.menuAction())
         self.menubar.addAction(self.menuReport.menuAction())
-        self.toolBar.addAction(self.actionProducts)
-        self.toolBar.addAction(self.actionCustomers)
-        self.toolBar.addAction(self.actionEmployees)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionNewOrder)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionRevenueReport)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionSettings)
+        self.menubar.addAction(self.menuHR.menuAction())
+        self.menubar.addAction(self.menuSystem.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(-1)
@@ -179,30 +216,40 @@ class Ui_MainWindow(object):
         self.menuSale.setTitle(_translate("MainWindow", "🧾 Bán hàng"))
         self.menuImport.setTitle(_translate("MainWindow", "📥 Nhập hàng"))
         self.menuReport.setTitle(_translate("MainWindow", "📊 Báo cáo"))
+        self.menuHR.setTitle(_translate("MainWindow", "👨‍💼 Nhân sự"))
         self.menuSystem.setTitle(_translate("MainWindow", "⚙️ Hệ thống"))
         self.menuHelp.setTitle(_translate("MainWindow", "❓ Trợ giúp"))
-        self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.actionChangePassword.setText(_translate("MainWindow", "🔐 Đổi mật khẩu"))
         self.actionLogout.setText(_translate("MainWindow", "🚪 Đăng xuất"))
         self.actionExit.setText(_translate("MainWindow", "❌ Thoát"))
+        self.actionExit.setShortcut(_translate("MainWindow", "Alt+F4"))
         self.actionProducts.setText(_translate("MainWindow", "📦 Sản phẩm"))
+        self.actionProducts.setShortcut(_translate("MainWindow", "Ctrl+P"))
         self.actionCustomers.setText(_translate("MainWindow", "👥 Khách hàng"))
+        self.actionCustomers.setShortcut(_translate("MainWindow", "Ctrl+C"))
         self.actionEmployees.setText(_translate("MainWindow", "👨‍💼 Nhân viên"))
+        self.actionEmployees.setShortcut(_translate("MainWindow", "Ctrl+E"))
         self.actionSuppliers.setText(_translate("MainWindow", "🏭 Nhà cung cấp"))
         self.actionNewOrder.setText(_translate("MainWindow", "🛒 Hóa đơn mới"))
+        self.actionNewOrder.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.actionOrderManagement.setText(_translate("MainWindow", "📋 Quản lý hóa đơn"))
         self.actionWarranty.setText(_translate("MainWindow", "🔧 Quản lý bảo hành"))
-        self.actionImportGoods.setText(_translate("MainWindow", "📦 Nhập kho"))
+        self.actionImportGoods.setText(_translate("MainWindow", "📥 Nhập kho"))
         self.actionSupplierManagement.setText(_translate("MainWindow", "🏭 Quản lý nhà cung cấp"))
         self.actionRevenueReport.setText(_translate("MainWindow", "💰 Báo cáo doanh thu"))
-        self.actionInventoryReport.setText(_translate("MainWindow", "📊 Báo cáo tồn kho"))
+        self.actionInventoryReport.setText(_translate("MainWindow", "📦 Báo cáo tồn kho"))
         self.actionEmployeeSalesReport.setText(_translate("MainWindow", "👨‍💼 Doanh số nhân viên"))
         self.actionSalaryReport.setText(_translate("MainWindow", "💵 Báo cáo lương"))
+        self.actionShiftSchedule.setText(_translate("MainWindow", "📅 Phân ca làm việc"))
+        self.actionAttendance.setText(_translate("MainWindow", "⏰ Chấm công"))
+        self.actionAttendance.setShortcut(_translate("MainWindow", "Ctrl+A"))
+        self.actionSalaryCalculation.setText(_translate("MainWindow", "💰 Tính lương"))
         self.actionBackup.setText(_translate("MainWindow", "💾 Sao lưu dữ liệu"))
         self.actionRestore.setText(_translate("MainWindow", "🔄 Phục hồi dữ liệu"))
         self.actionSettings.setText(_translate("MainWindow", "⚙️ Cài đặt"))
         self.actionLogs.setText(_translate("MainWindow", "📝 Nhật ký hệ thống"))
         self.actionGuide.setText(_translate("MainWindow", "📖 Hướng dẫn sử dụng"))
+        self.actionGuide.setShortcut(_translate("MainWindow", "F1"))
         self.actionAbout.setText(_translate("MainWindow", "ℹ️ Giới thiệu"))
         self.actionHome.setText(_translate("MainWindow", "🏠 Trang chủ"))
 

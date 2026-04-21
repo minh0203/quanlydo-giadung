@@ -136,17 +136,7 @@
           </item>
           <item>
            <property name="text">
-            <string>👨‍💼 Doanh số nhân viên</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>🏆 Top sản phẩm bán chạy</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>💰 Báo cáo lương</string>
            </property>
           </item>
           <item>

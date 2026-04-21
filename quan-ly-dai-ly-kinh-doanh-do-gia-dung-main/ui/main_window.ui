@@ -135,8 +135,6 @@
    <addaction name="menuSale"/>
    <addaction name="menuImport"/>
    <addaction name="menuReport"/>
-   <addaction name="menuSystem"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -149,8 +147,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionHome"/>
-   <addaction name="separator"/>
    <addaction name="actionProducts"/>
    <addaction name="actionCustomers"/>
    <addaction name="actionEmployees"/>

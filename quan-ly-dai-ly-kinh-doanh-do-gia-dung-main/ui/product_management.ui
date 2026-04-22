@@ -31,7 +31,7 @@
         left: 15px;
         padding: 0 8px 0 8px;
         color: #2c3e50;
-        font-size: 14px;
+        font-size: 16px;
     }
     QTableWidget {
         background-color: white;
@@ -40,13 +40,14 @@
         selection-background-color: #3498db;
         selection-color: white;
         border-radius: 10px;
+        font-size: 16px;
     }
     QHeaderView::section {
         background-color: #3498db;
         color: white;
         padding: 12px;
         font-weight: bold;
-        font-size: 14px;
+        font-size: 16px;
         border: none;
     }
     QPushButton {
@@ -105,10 +106,11 @@
     }
     QLabel {
         color: #2c3e50;
-        font-size: 13px;
+        font-size: 16px;
+        font-weight: bold;
     }
     QLabel#lblTitle {
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
         color: #2c3e50;
     }
@@ -138,13 +140,6 @@
         <property name="text">
          <string>Tìm kiếm:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item>
@@ -155,7 +150,7 @@
         <property name="minimumSize">
          <size>
           <width>350</width>
-          <height>35</height>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -167,8 +162,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>110</width>
-          <height>40</height>
+          <width>120</width>
+          <height>45</height>
          </size>
         </property>
        </widget>
@@ -178,21 +173,14 @@
         <property name="text">
          <string>Danh mục:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="cboCategory">
         <property name="minimumSize">
          <size>
-          <width>150</width>
-          <height>35</height>
+          <width>180</width>
+          <height>40</height>
          </size>
         </property>
         <item>
@@ -257,8 +245,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>140</width>
-          <height>45</height>
+          <width>160</width>
+          <height>50</height>
          </size>
         </property>
        </widget>
@@ -288,7 +276,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>300</height>
+          <height>350</height>
          </size>
         </property>
         <column>
@@ -355,13 +343,6 @@
         <property name="text">
          <string>Mã sản phẩm:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="0" column="1">
@@ -371,8 +352,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>200</width>
-          <height>35</height>
+          <width>220</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -381,13 +362,6 @@
        <widget class="QLabel" name="lblProductName">
         <property name="text">
          <string>Tên sản phẩm:</string>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
         </property>
        </widget>
       </item>
@@ -398,8 +372,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>35</height>
+          <width>280</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -411,21 +385,14 @@
         <property name="text">
          <string>Danh mục:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="cboProductCategory">
         <property name="minimumSize">
          <size>
-          <width>200</width>
-          <height>35</height>
+          <width>220</width>
+          <height>40</height>
          </size>
         </property>
         <item>
@@ -470,13 +437,6 @@
         <property name="text">
          <string>Thương hiệu:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="1" column="3">
@@ -486,8 +446,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>35</height>
+          <width>280</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -499,13 +459,6 @@
         <property name="text">
          <string>Giá nhập:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -515,8 +468,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>200</width>
-          <height>35</height>
+          <width>220</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -525,13 +478,6 @@
        <widget class="QLabel" name="lblSellingPrice">
         <property name="text">
          <string>Giá bán:</string>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
         </property>
        </widget>
       </item>
@@ -542,8 +488,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>250</width>
-          <height>35</height>
+          <width>280</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -555,13 +501,6 @@
         <property name="text">
          <string>Tồn kho:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="3" column="1">
@@ -571,8 +510,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>200</width>
-          <height>35</height>
+          <width>220</width>
+          <height>40</height>
          </size>
         </property>
        </widget>
@@ -582,21 +521,14 @@
         <property name="text">
          <string>Đơn vị tính:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="3" column="3">
        <widget class="QComboBox" name="cboUnit">
         <property name="minimumSize">
          <size>
-          <width>120</width>
-          <height>35</height>
+          <width>140</width>
+          <height>40</height>
          </size>
         </property>
         <item>
@@ -623,13 +555,6 @@
         <property name="text">
          <string>Mô tả:</string>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
        </widget>
       </item>
       <item row="4" column="1" colspan="3">
@@ -637,17 +562,22 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>80</height>
+          <height>100</height>
          </size>
         </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>60</height>
+          <height>80</height>
          </size>
         </property>
         <property name="placeholderText">
          <string>Nhập mô tả sản phẩm (tùy chọn)</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
         </property>
        </widget>
       </item>
@@ -667,8 +597,8 @@
         <size>
          <width>40</width>
          <height>20</height>
-         </size>
-        </property>
+        </size>
+       </property>
       </spacer>
      </item>
      <item>
@@ -678,11 +608,11 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
-         <height>45</height>
-         </size>
-        </property>
-       </widget>
+         <width>160</width>
+         <height>55</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnEdit">
@@ -691,11 +621,11 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
-         <height>45</height>
-         </size>
-        </property>
-       </widget>
+         <width>160</width>
+         <height>55</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnDelete">
@@ -704,11 +634,11 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
-         <height>45</height>
-         </size>
-        </property>
-       </widget>
+         <width>160</width>
+         <height>55</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnClear">
@@ -717,11 +647,11 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
-         <height>45</height>
-         </size>
-        </property>
-       </widget>
+         <width>160</width>
+         <height>55</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

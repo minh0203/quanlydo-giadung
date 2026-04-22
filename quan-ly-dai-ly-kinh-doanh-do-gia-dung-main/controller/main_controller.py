@@ -12,6 +12,7 @@ from ui.salary_calculation import Ui_SalaryCalculation
 from ui.attendance import Ui_Attendance
 from ui.OrderManagement import Ui_OrderManagement
 from ui.WarrantyManagement import Ui_WarrantyManagement
+from ui.SupplierManagement import Ui_SupplierManagement
 
 # Import controllers
 from controller.employee_controller import EmployeeController
@@ -25,6 +26,7 @@ from controller.salary_controller import SalaryController
 from controller.attendance_controller import AttendanceController
 from controller.order_controller import OrderController
 from controller.warranty_controller import WarrantyController
+from controller.supplier_controller import SupplierController
 
 
 class MainController:
@@ -51,6 +53,7 @@ class MainController:
             ("attendance", Ui_Attendance, AttendanceController, 8),
             ("order", Ui_OrderManagement, OrderController, 9),
             ("warranty", Ui_WarrantyManagement, WarrantyController, 10),
+            ("supplier", Ui_SupplierManagement, SupplierController, 11),
         ]
         
         for name, ui_class, controller_class, index in modules_config:
@@ -81,6 +84,7 @@ class MainController:
         self.view.actionOrderManagement.triggered.connect(lambda: self.show_module("order"))
         self.view.actionWarranty.triggered.connect(lambda: self.show_module("warranty"))
         self.view.actionImportGoods.triggered.connect(lambda: self.show_module("import"))
+        self.view.actionSupplierManagement.triggered.connect(lambda: self.show_module("supplier"))
         self.view.actionRevenueReport.triggered.connect(lambda: self.show_module("report"))
         self.view.actionExit.triggered.connect(self.view.close)
     

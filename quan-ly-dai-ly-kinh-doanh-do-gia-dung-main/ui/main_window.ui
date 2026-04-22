@@ -127,9 +127,6 @@
     <addaction name="actionProducts"/>
     <addaction name="actionCustomers"/>
     <addaction name="actionEmployees"/>
-    <addaction name="actionSuppliers"/>
-    <addaction name="separator"/>
-    <addaction name="actionAttendance"/>
    </widget>
    
    <!-- 🧾 BÁN HÀNG -->
@@ -162,44 +159,11 @@
     <addaction name="actionSalaryReport"/>
    </widget>
    
-   <!-- 👨‍💼 NHÂN SỰ -->
-   <widget class="QMenu" name="menuHR">
-    <property name="title">
-     <string>👨‍💼 Nhân sự</string>
-    </property>
-    <addaction name="actionShiftSchedule"/>
-    <addaction name="actionAttendance"/>
-    <addaction name="actionSalaryCalculation"/>
-   </widget>
-   
-   <!-- ⚙️ HỆ THỐNG -->
-   <widget class="QMenu" name="menuSystem">
-    <property name="title">
-     <string>⚙️ Hệ thống</string>
-    </property>
-    <addaction name="actionBackup"/>
-    <addaction name="actionRestore"/>
-    <addaction name="actionSettings"/>
-    <addaction name="actionLogs"/>
-   </widget>
-   
-   <!-- ❓ TRỢ GIÚP -->
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>❓ Trợ giúp</string>
-    </property>
-    <addaction name="actionGuide"/>
-    <addaction name="actionAbout"/>
-   </widget>
-   
    <addaction name="menuFile"/>
    <addaction name="menuManage"/>
    <addaction name="menuSale"/>
    <addaction name="menuImport"/>
    <addaction name="menuReport"/>
-   <addaction name="menuHR"/>
-   <addaction name="menuSystem"/>
-   <addaction name="menuHelp"/>
   </widget>
   
   <widget class="QStatusBar" name="statusbar"/>
@@ -249,11 +213,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
-   </property>
-  </action>
-  <action name="actionSuppliers">
-   <property name="text">
-    <string>🏭 Nhà cung cấp</string>
    </property>
   </action>
   
@@ -311,7 +270,7 @@
    </property>
   </action>
   
-  <!-- Nhân sự -->
+  <!-- Các action cũ không dùng nữa (có thể giữ nguyên nhưng không hiển thị trên menu) -->
   <action name="actionShiftSchedule">
    <property name="text">
     <string>📅 Phân ca làm việc</string>
@@ -330,8 +289,6 @@
     <string>💰 Tính lương</string>
    </property>
   </action>
-  
-  <!-- Hệ thống -->
   <action name="actionBackup">
    <property name="text">
     <string>💾 Sao lưu dữ liệu</string>
@@ -352,8 +309,6 @@
     <string>📝 Nhật ký hệ thống</string>
    </property>
   </action>
-  
-  <!-- Trợ giúp -->
   <action name="actionGuide">
    <property name="text">
     <string>📖 Hướng dẫn sử dụng</string>

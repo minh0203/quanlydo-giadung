@@ -225,7 +225,7 @@ class Ui_ReportViewer(object):
     def retranslateUi(self, ReportViewer):
         _translate = QtCore.QCoreApplication.translate
         ReportViewer.setWindowTitle(_translate("ReportViewer", "Báo cáo thống kê"))
-        self.lblTitle.setText(_translate("ReportViewer", "📊 BÁO CÁO THỐNG KÊ"))
+        self.lblTitle.setText(_translate("ReportViewer", "📊 BÁO CÁO DOANH THU"))
         self.groupBoxFilter.setTitle(_translate("ReportViewer", "Bộ lọc báo cáo"))
         self.lblReportType.setText(_translate("ReportViewer", "Loại báo cáo:"))
         self.cboReportType.setItemText(0, _translate("ReportViewer", "📈 Báo cáo doanh thu"))

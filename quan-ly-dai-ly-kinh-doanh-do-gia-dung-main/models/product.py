@@ -33,7 +33,28 @@ class Product:
         )
 
     @classmethod
-    def create(cls, product_id, name, category="", brand="", purchase_price=0.0, selling_price=0.0, quantity=0, unit="Cái", description=""):
+    def generate_product_id(cls):
+        """Tạo mã sản phẩm tự động dạng SP001, SP002, ..."""
+        rows = Database.execute(
+            "SELECT product_id FROM products WHERE product_id LIKE 'SP%'",
+            fetch_all=True,
+        )
+        max_num = 0
+        for row in rows:
+            product_id = row[0]
+            if product_id.startswith('SP'):
+                try:
+                    num = int(product_id[2:])
+                    if num > max_num:
+                        max_num = num
+                except ValueError:
+                    pass
+        new_num = max_num + 1
+        return f"SP{new_num:03d}"
+
+    @classmethod
+    def create(cls, name, category="", brand="", purchase_price=0.0, selling_price=0.0, quantity=0, unit="Cái", description=""):
+        product_id = cls.generate_product_id()
         Database.execute(
             "INSERT INTO products (product_id, name, category, brand, purchase_price, selling_price, quantity, unit, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (product_id, name, category, brand, purchase_price, selling_price, quantity, unit, description),

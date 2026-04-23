@@ -85,8 +85,8 @@ class ProductController:
         """Hiển thị form thêm sản phẩm mới"""
         self.clear_form()
         self.current_product = None
-        # Enable các field
-        self.set_field_enabled("txtProductCode", True)
+        # Disable mã sản phẩm vì tự động tạo
+        self.set_field_enabled("txtProductCode", False)
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.setEnabled(True)
         if hasattr(self.view, "btnEdit"):
@@ -96,7 +96,6 @@ class ProductController:
         """Lưu sản phẩm (thêm mới hoặc cập nhật)"""
         try:
             # Lấy dữ liệu từ form
-            product_id = self.get_text_field("txtProductCode")
             name = self.get_text_field("txtProductName")
             category = self.get_combo_field("cboProductCategory")
             brand = self.get_text_field("txtBrand")
@@ -107,8 +106,8 @@ class ProductController:
             description = self.get_text_field("txtDescription")
 
             # Kiểm tra dữ liệu bắt buộc
-            if not product_id or not name:
-                QMessageBox.warning(None, "Cảnh báo", "Vui lòng nhập mã sản phẩm và tên sản phẩm!")
+            if not name:
+                QMessageBox.warning(None, "Cảnh báo", "Vui lòng nhập tên sản phẩm!")
                 return
 
             if self.current_product:
@@ -125,14 +124,8 @@ class ProductController:
                 self.current_product.update()
                 QMessageBox.information(None, "Thành công", "Đã cập nhật sản phẩm thành công!")
             else:
-                # Kiểm tra sản phẩm đã tồn tại
-                if Product.get_by_id(product_id):
-                    QMessageBox.warning(None, "Cảnh báo", "Mã sản phẩm đã tồn tại!")
-                    return
-
                 # Tạo sản phẩm mới
                 product = Product.create(
-                    product_id=product_id,
                     name=name,
                     category=category,
                     brand=brand,
@@ -142,7 +135,7 @@ class ProductController:
                     unit=unit,
                     description=description
                 )
-                QMessageBox.information(None, "Thành công", "Đã thêm sản phẩm thành công!")
+                QMessageBox.information(None, "Thành công", f"Đã thêm sản phẩm thành công! Mã sản phẩm: {product.product_id}")
 
             self.clear_form()
             self.load_products()

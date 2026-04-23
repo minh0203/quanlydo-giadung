@@ -40,9 +40,11 @@ class Database:
     @classmethod
     def initialize_schema(cls):
         from .product import Product
+        from .customer import Customer
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
+        Customer.create_table(cursor)
         conn.commit()
         cursor.close()
         conn.close()

@@ -14,7 +14,6 @@ from ui.OrderManagement import Ui_OrderManagement
 from ui.WarrantyManagement import Ui_WarrantyManagement
 from ui.SupplierManagement import Ui_SupplierManagement
 from ui.InventoryReport import Ui_InventoryReport
-from ui.EmployeeSalesReport import Ui_EmployeeSalesReport
 
 # Import controllers
 from controller.employee_controller import EmployeeController
@@ -30,7 +29,6 @@ from controller.order_controller import OrderController
 from controller.warranty_controller import WarrantyController
 from controller.supplier_controller import SupplierController
 from controller.inventory_report_controller import InventoryReportController
-from controller.employee_sales_report_controller import EmployeeSalesReportController
 
 
 class MainController:
@@ -59,7 +57,6 @@ class MainController:
             ("warranty", Ui_WarrantyManagement, WarrantyController, 10),
             ("supplier", Ui_SupplierManagement, SupplierController, 11),
             ("inventory_report", Ui_InventoryReport, InventoryReportController, 12),
-            ("employee_sales_report", Ui_EmployeeSalesReport, EmployeeSalesReportController, 13),
         ]
         
         for name, ui_class, controller_class, index in modules_config:
@@ -93,7 +90,6 @@ class MainController:
         self.view.actionSupplierManagement.triggered.connect(lambda: self.show_module("supplier"))
         self.view.actionRevenueReport.triggered.connect(lambda: self.show_module("report"))
         self.view.actionInventoryReport.triggered.connect(lambda: self.show_module("inventory_report"))
-        self.view.actionEmployeeSalesReport.triggered.connect(lambda: self.show_module("employee_sales_report"))
         self.view.actionExit.triggered.connect(self.view.close)
     
     def show_module(self, module_name):

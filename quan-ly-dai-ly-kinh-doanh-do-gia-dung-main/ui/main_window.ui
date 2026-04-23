@@ -148,15 +148,13 @@
     <addaction name="actionSupplierManagement"/>
    </widget>
    
-   <!-- 📊 BÁO CÁO -->
+   <!-- 📊 BÁO CÁO - CHỈ CÒN DOANH THU VÀ TỒN KHO -->
    <widget class="QMenu" name="menuReport">
     <property name="title">
      <string>📊 Báo cáo</string>
     </property>
     <addaction name="actionRevenueReport"/>
     <addaction name="actionInventoryReport"/>
-    <addaction name="actionEmployeeSalesReport"/>
-    <addaction name="actionSalaryReport"/>
    </widget>
    
    <addaction name="menuFile"/>
@@ -259,6 +257,8 @@
     <string>📦 Báo cáo tồn kho</string>
    </property>
   </action>
+  
+  <!-- Các action đã xóa khỏi menu nhưng giữ lại để tránh lỗi -->
   <action name="actionEmployeeSalesReport">
    <property name="text">
     <string>👨‍💼 Doanh số nhân viên</string>
@@ -269,8 +269,6 @@
     <string>💵 Báo cáo lương</string>
    </property>
   </action>
-  
-  <!-- Các action cũ không dùng nữa (có thể giữ nguyên nhưng không hiển thị trên menu) -->
   <action name="actionShiftSchedule">
    <property name="text">
     <string>📅 Phân ca làm việc</string>

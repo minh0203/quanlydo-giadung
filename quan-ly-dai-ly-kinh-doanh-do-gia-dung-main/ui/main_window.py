@@ -174,8 +174,6 @@ class Ui_MainWindow(object):
         self.menuImport.addAction(self.actionSupplierManagement)
         self.menuReport.addAction(self.actionRevenueReport)
         self.menuReport.addAction(self.actionInventoryReport)
-        self.menuReport.addAction(self.actionEmployeeSalesReport)
-        self.menuReport.addAction(self.actionSalaryReport)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuManage.menuAction())
         self.menubar.addAction(self.menuSale.menuAction())

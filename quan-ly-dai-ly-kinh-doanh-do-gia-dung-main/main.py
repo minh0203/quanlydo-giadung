@@ -12,6 +12,9 @@ from ui.main_window import Ui_MainWindow
 from controller.auth_controller import LoginAuthController, RegisterAuthController
 from controller.main_controller import MainController
 
+# Import Database
+from models.database import Database
+
 
 class RegisterDialog(QDialog, Ui_RegisterDialog):
     """Màn hình đăng ký - logic xử lý ở controller"""
@@ -48,6 +51,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        
+        # Khởi tạo database
+        Database.initialize_schema()
         
         # Tạo stacked widget
         self.stacked_widget = QStackedWidget()

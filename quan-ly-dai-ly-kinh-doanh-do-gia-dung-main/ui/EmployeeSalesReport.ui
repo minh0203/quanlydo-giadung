@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmployeeSalesReport</class>
+ <widget class="QWidget" name="EmployeeSalesReport">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Doanh số nhân viên</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #f0f2f5;
+    }
+    QGroupBox {
+        font-weight: bold;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        background-color: white;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 15px;
+        padding: 0 8px 0 8px;
+        color: #2c3e50;
+        font-size: 16px;
+    }
+    QTableWidget {
+        background-color: white;
+        alternate-background-color: #f9f9f9;
+        gridline-color: #e0e0e0;
+        selection-background-color: #3498db;
+        selection-color: white;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    QHeaderView::section {
+        background-color: #3498db;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 14px;
+        border: none;
+    }
+    QPushButton {
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: bold;
+        font-size: 16px;
+        min-width: 120px;
+        min-height: 40px;
+    }
+    QPushButton#btnSearch {
+        background-color: #3498db;
+        color: white;
+    }
+    QPushButton#btnSearch:hover {
+        background-color: #2980b9;
+    }
+    QPushButton#btnExport {
+        background-color: #27ae60;
+        color: white;
+    }
+    QPushButton#btnExport:hover {
+        background-color: #2ecc71;
+    }
+    QPushButton#btnPrint {
+        background-color: #9b59b6;
+        color: white;
+    }
+    QPushButton#btnPrint:hover {
+        background-color: #8e44ad;
+    }
+    QPushButton#btnReset {
+        background-color: #e67e22;
+        color: white;
+    }
+    QLineEdit, QComboBox, QDateEdit {
+        padding: 12px 16px;
+        border: 1px solid #dcdfe6;
+        border-radius: 8px;
+        background-color: white;
+        font-size: 16px;
+        min-height: 35px;
+    }
+    QLabel {
+        color: #2c3e50;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    QLabel#lblTitle {
+        font-size: 26px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    QLabel#lblTotalRevenue {
+        font-size: 28px;
+        font-weight: bold;
+        color: #27ae60;
+    }
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>💲 DOANH SỐ NHÂN VIÊN</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+
+   <!-- Bộ lọc -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxFilter">
+     <property name="title">
+      <string>🔍 Bộ lọc báo cáo</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblEmployee">
+        <property name="text">
+         <string>Nhân viên:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="cboEmployee">
+        <item>
+         <property name="text">
+          <string>Tất cả nhân viên</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Nguyễn Văn A</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Trần Thị B</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lê Văn C</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Phạm Thị D</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="lblDateRange">
+        <property name="text">
+         <string>Khoảng thời gian:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <layout class="QHBoxLayout" name="dateLayout">
+        <item>
+         <widget class="QDateEdit" name="dateFrom">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+          <property name="displayFormat">
+           <string>dd/MM/yyyy</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblTo">
+          <property name="text">
+           <string>→</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDateEdit" name="dateTo">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+          <property name="displayFormat">
+           <string>dd/MM/yyyy</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblQuickFilter">
+        <property name="text">
+         <string>Nhanh:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <layout class="QHBoxLayout" name="quickFilterLayout">
+        <item>
+         <widget class="QPushButton" name="btnToday">
+          <property name="text">
+           <string>Hôm nay</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>35</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnWeek">
+          <property name="text">
+           <string>Tuần này</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnMonth">
+          <property name="text">
+           <string>Tháng này</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnQuarter">
+          <property name="text">
+           <string>Quý này</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnYear">
+          <property name="text">
+           <string>Năm nay</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnSearch">
+          <property name="text">
+           <string>🔍 Xem báo cáo</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnReset">
+          <property name="text">
+           <string>🔄 Đặt lại</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Thống kê tổng hợp -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxStats">
+     <property name="title">
+      <string>📊 Tổng hợp doanh số</string>
+     </property>
+     <layout class="QHBoxLayout" name="statsLayout">
+      <item>
+       <widget class="QLabel" name="lblTotalOrders">
+        <property name="text">
+         <string>Tổng hóa đơn: 0</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblTotalProductsSold">
+        <property name="text">
+         <string>Tổng SP bán: 0</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblTotalRevenue">
+        <property name="text">
+         <string>Tổng doanh thu: 0 VNĐ</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblAvgOrderValue">
+        <property name="text">
+         <string>TB hóa đơn: 0 VNĐ</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Bảng doanh số theo nhân viên -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxEmployeeSales">
+     <property name="title">
+      <string>👨‍💼 Bảng doanh số theo nhân viên</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="tableEmployeeSales">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>300</height>
+         </size>
+        </property>
+        <column>
+         <property name="text">
+          <string>STT</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Mã NV</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tên nhân viên</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Chức vụ</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Số hóa đơn</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Số SP bán</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Doanh thu</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Tỷ lệ %</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Hiệu suất</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="tableButtonLayout">
+        <item>
+         <widget class="QPushButton" name="btnExport">
+          <property name="text">
+           <string>📊 Xuất Excel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnPrint">
+          <property name="text">
+           <string>🖨️ In báo cáo</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Bảng chi tiết theo nhân viên -->
+   <item>
+    <widget class="QGroupBox" name="groupBoxDetail">
+     <property name="title">
+      <string>📋 Chi tiết hóa đơn theo nhân viên</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QTableWidget" name="tableOrderDetails">
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>200</height>
+         </size>
+        </property>
+        <column>
+         <property name="text">
+          <string>Mã HD</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Ngày bán</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Khách hàng</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Sản phẩm</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Số lượng</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Thành tiền</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>

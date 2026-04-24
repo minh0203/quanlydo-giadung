@@ -41,10 +41,14 @@ class Database:
     def initialize_schema(cls):
         from .product import Product
         from .customer import Customer
+        from .employee import Employee
+        from .sale_order import SaleOrder
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
         Customer.create_table(cursor)
+        Employee.create_table(cursor)
+        SaleOrder.create_table(cursor)
         conn.commit()
         cursor.close()
         conn.close()

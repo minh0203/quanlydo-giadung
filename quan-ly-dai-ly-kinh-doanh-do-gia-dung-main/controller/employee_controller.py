@@ -66,8 +66,48 @@ class EmployeeController:
     def __init__(self, view):
         self.view = view
         self.current_employee = None
+        self.initialize_ui()
         self.setup_connections()
         self.load_employees()
+    
+    def initialize_ui(self):
+        """Khởi tạo các giá trị UI"""
+        # Populate combo boxes
+        if hasattr(self.view, "cboRole"):
+            self.view.cboRole.clear()
+            self.view.cboRole.addItems([
+                "Admin (Quản trị hệ thống)",
+                "Sale (Nhân viên bán hàng)",
+                "Warehouse (Quản lý kho)",
+                "Accountant (Kế toán)"
+            ])
+        
+        if hasattr(self.view, "cboStatus"):
+            self.view.cboStatus.clear()
+            self.view.cboStatus.addItems([
+                "✅ Đang làm",
+                "⏸️ Tạm nghỉ",
+                "❌ Đã nghỉ"
+            ])
+        
+        if hasattr(self.view, "cboRoleFilter"):
+            self.view.cboRoleFilter.clear()
+            self.view.cboRoleFilter.addItems([
+                "Tất cả",
+                "Admin",
+                "Sale",
+                "Warehouse",
+                "Accountant"
+            ])
+        
+        if hasattr(self.view, "cboStatusFilter"):
+            self.view.cboStatusFilter.clear()
+            self.view.cboStatusFilter.addItems([
+                "Tất cả",
+                "Đang làm",
+                "Tạm nghỉ",
+                "Đã nghỉ"
+            ])
 
     def setup_connections(self):
         """Thiết lập kết nối các signal"""
@@ -351,6 +391,7 @@ class EmployeeController:
             self.current_employee = Employee.get_by_id(employee_id)
             if self.current_employee:
                 self.fill_form()
+                self.update_statistics()
 
     def fill_form(self):
         """Điền dữ liệu nhân viên vào form"""
@@ -367,7 +408,7 @@ class EmployeeController:
         self.set_text_field("txtAddress", self.current_employee.address)
         self.set_date_field("dateHireDate", self.current_employee.hire_date)
         self.set_combo_field("cboRole", self.current_employee.role)
-        self.set_text_field("txtBaseSalary", str(self.current_employee.base_salary))
+        self.set_text_field("txtBaseSalary", str(int(self.current_employee.base_salary)))
         self.set_text_field("txtCommissionRate", str(self.current_employee.commission_rate))
         self.set_text_field("txtUsername", self.current_employee.username)
         self.set_text_field("txtPassword", self.current_employee.password)
@@ -379,6 +420,50 @@ class EmployeeController:
             self.view.btnSave.setEnabled(False)
         if hasattr(self.view, "btnUpdate"):
             self.view.btnUpdate.setEnabled(True)
+    
+    def update_statistics(self):
+        """Cập nhật thống kê nhân viên"""
+        if not self.current_employee:
+            return
+        
+        try:
+            age = self.current_employee.get_age()
+            working_days = self.current_employee.get_working_days()
+            working_years = working_days // 365
+            working_months = (working_days % 365) // 30
+            
+            stats_text = f"""
+            📊 THỐNG KÊ NHÂN VIÊN
+            {'='*50}
+            
+            👤 Thông tin cơ bản:
+            • Mã NV: {self.current_employee.employee_id}
+            • Tên: {self.current_employee.full_name}
+            • Tuổi: {age if age else 'N/A'} tuổi
+            • Giới tính: {self.current_employee.gender}
+            
+            💼 Thông tin làm việc:
+            • Chức vụ: {self.current_employee.role}
+            • Ngày vào: {self.current_employee.hire_date}
+            • Thời gian làm việc: {working_years} năm {working_months} tháng
+            • Trạng thái: {self.current_employee.status}
+            
+            💰 Thông tin lương:
+            • Lương cơ bản: {self.current_employee.base_salary:,.0f} VNĐ
+            • Hoa hồng: {self.current_employee.commission_rate}%
+            • Lương theo giờ: {self.current_employee.base_salary / 160:,.0f} VNĐ
+            
+            📞 Liên hệ:
+            • Email: {self.current_employee.email}
+            • Điện thoại: {self.current_employee.phone}
+            • Địa chỉ: {self.current_employee.address}
+            """
+            
+            if hasattr(self.view, "lblStatsInfo"):
+                self.view.lblStatsInfo.setText(stats_text)
+        except Exception as e:
+            if hasattr(self.view, "lblStatsInfo"):
+                self.view.lblStatsInfo.setText(f"Lỗi: {str(e)}")
 
     def clear_form(self):
         """Xóa dữ liệu trong form"""

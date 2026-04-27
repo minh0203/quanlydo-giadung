@@ -42,11 +42,13 @@ class Database:
         from .product import Product
         from .customer import Customer
         from .employee import Employee
+        from .salary import Salary
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
         Customer.create_table(cursor)
         Employee.create_table(cursor)
+        Salary.create_table(cursor)
         conn.commit()
         cursor.close()
         conn.close()

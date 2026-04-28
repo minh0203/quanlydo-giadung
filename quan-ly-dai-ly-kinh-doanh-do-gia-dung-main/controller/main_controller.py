@@ -8,7 +8,6 @@ from ui.sale_order import Ui_SaleOrder
 from ui.import_goods import Ui_ImportGoods
 from ui.report_viewer import Ui_ReportViewer
 from ui.shift_schedule import Ui_ShiftSchedule
-from ui.salary_calculation import Ui_SalaryCalculation
 from ui.attendance import Ui_Attendance
 from ui.OrderManagement import Ui_OrderManagement
 from ui.WarrantyManagement import Ui_WarrantyManagement
@@ -23,7 +22,6 @@ from controller.sale_controller import SaleController
 from controller.import_controller import ImportController
 from controller.report_controller import ReportController
 from controller.shift_controller import ShiftController
-from controller.salary_controller import SalaryController
 from controller.attendance_controller import AttendanceController
 from controller.order_controller import OrderController
 from controller.warranty_controller import WarrantyController
@@ -51,12 +49,11 @@ class MainController:
             ("import", Ui_ImportGoods, ImportController, 4),
             ("report", Ui_ReportViewer, ReportController, 5),
             ("shift", Ui_ShiftSchedule, ShiftController, 6),
-            ("salary", Ui_SalaryCalculation, SalaryController, 7),
-            ("attendance", Ui_Attendance, AttendanceController, 8),
-            ("order", Ui_OrderManagement, OrderController, 9),
-            ("warranty", Ui_WarrantyManagement, WarrantyController, 10),
-            ("supplier", Ui_SupplierManagement, SupplierController, 11),
-            ("inventory_report", Ui_InventoryReport, InventoryReportController, 12),
+            ("attendance", Ui_Attendance, AttendanceController, 7),
+            ("order", Ui_OrderManagement, OrderController, 8),
+            ("warranty", Ui_WarrantyManagement, WarrantyController, 9),
+            ("supplier", Ui_SupplierManagement, SupplierController, 10),
+            ("inventory_report", Ui_InventoryReport, InventoryReportController, 11),
         ]
         
         for name, ui_class, controller_class, index in modules_config:
@@ -98,3 +95,9 @@ class MainController:
             index = self.modules[module_name]["index"]
             self.view.stacked_widget.setCurrentIndex(index)
             self.view.statusbar.showMessage(f"📋 {module_name.replace('_', ' ').title()}")
+            if module_name == "sale" and self.controllers.get("sale"):
+                try:
+                    self.controllers["sale"].load_products()
+                    self.controllers["sale"].refresh_cart_table()
+                except Exception:
+                    pass

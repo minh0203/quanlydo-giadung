@@ -2,7 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QDialog, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QDesktopWidget
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 
 # Import UI
 from ui.login import Ui_LoginDialog
@@ -285,6 +285,8 @@ class LoginDialog(QDialog, Ui_LoginDialog):
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Cửa sổ chính - logic xử lý ở controller"""
+    logout_signal = pyqtSignal()  # Tín hiệu khi đăng xuất
+    
     def __init__(self, current_user):
         super().__init__()
         self.setupUi(self)
@@ -318,21 +320,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    login = LoginDialog()
     
-    if login.exec() == QDialog.Accepted:
-        import controller.auth_controller as auth_module
-        current_user_obj = auth_module.current_user
+    while True:
+        # Hiển thị màn đăng nhập
+        login = LoginDialog()
+        result = login.exec()
         
-        if current_user_obj:
-            window = MainWindow(current_user_obj)
-            window.show()
-            sys.exit(app.exec())
+        if result == QDialog.Accepted:
+            import controller.auth_controller as auth_module
+            current_user_obj = auth_module.current_user
+            
+            if current_user_obj:
+                # Tạo cửa sổ chính
+                window = MainWindow(current_user_obj)
+                window.show()
+                
+                # Kết nối signal đăng xuất để quay lại login
+                logout_triggered = False
+                
+                def on_logout():
+                    nonlocal logout_triggered
+                    logout_triggered = True
+                    window.close()
+                
+                window.logout_signal.connect(on_logout)
+                
+                # Chạy ứng dụng
+                app.exec()
+                
+                # Nếu đăng xuất, tiếp tục vòng lặp để quay lại login
+                if logout_triggered:
+                    continue
+                else:
+                    # Nếu đóng cửa sổ chính (không phải đăng xuất), thoát ứng dụng
+                    break
+            else:
+                QMessageBox.warning(None, "Lỗi", "Không thể lấy thông tin người dùng!")
+                break
         else:
-            QMessageBox.warning(None, "Lỗi", "Không thể lấy thông tin người dùng!")
-            sys.exit()
-    else:
-        sys.exit()
+            # Người dùng đóng dialog đăng nhập
+            break
 
 
 if __name__ == "__main__":

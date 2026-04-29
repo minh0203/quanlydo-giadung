@@ -101,3 +101,8 @@ class MainController:
                     self.controllers["sale"].refresh_cart_table()
                 except Exception:
                     pass
+            elif module_name == "order" and self.controllers.get("order"):
+                try:
+                    self.controllers["order"].load_orders()
+                except Exception:
+                    pass

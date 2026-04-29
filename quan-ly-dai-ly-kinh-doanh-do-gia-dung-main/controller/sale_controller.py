@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QInputDialog
 from PyQt5.QtWidgets import QAbstractItemView
 from PyQt5.QtCore import Qt
 from models.product import Product
+from models.order import Order
 
 
 class SaleController:
@@ -209,16 +210,42 @@ class SaleController:
             return
 
         total = self.calculate_total()
+
+        # Nhập tên khách hàng
+        customer_name, ok = QInputDialog.getText(None, "Thông tin khách hàng", "Nhập tên khách hàng:")
+        if not ok or not customer_name.strip():
+            return
+
+        # Nhập ID nhân viên (có thể lấy từ session sau này)
+        employee_id, ok = QInputDialog.getText(None, "Thông tin nhân viên", "Nhập ID nhân viên:")
+        if not ok or not employee_id.strip():
+            return
+
         reply = QMessageBox.question(
             None,
             "Xác nhận thanh toán",
-            f"Tổng thanh toán là {self.format_currency(total)}. Bạn có muốn thanh toán?",
+            f"Tên khách hàng: {customer_name}\nID nhân viên: {employee_id}\nTổng thanh toán: {self.format_currency(total)}\n\nBạn có muốn thanh toán?",
             QMessageBox.Yes | QMessageBox.No,
         )
         if reply != QMessageBox.Yes:
             return
 
         try:
+            # Chuẩn bị dữ liệu items cho hóa đơn
+            order_items = []
+            for item in self.cart:
+                order_items.append({
+                    "product_id": item["product"].product_id,
+                    "product_name": item["product"].name,
+                    "quantity": item["quantity"],
+                    "unit_price": item["product"].selling_price,
+                    "total_price": item["product"].selling_price * item["quantity"]
+                })
+
+            # Tạo hóa đơn
+            order = Order.create(customer_name.strip(), "", employee_id.strip(), order_items, total)
+
+            # Cập nhật số lượng sản phẩm
             for item in self.cart:
                 product = item["product"]
                 product.quantity -= item["quantity"]
@@ -227,7 +254,7 @@ class SaleController:
             self.cart.clear()
             self.refresh_cart_table()
             self.load_products()
-            QMessageBox.information(None, "Thành công", "Đã thanh toán hóa đơn thành công!")
+            QMessageBox.information(None, "Thành công", f"Đã thanh toán hóa đơn thành công!\nMã hóa đơn: {order.order_number}")
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Thanh toán không thành công: {str(e)}")
 

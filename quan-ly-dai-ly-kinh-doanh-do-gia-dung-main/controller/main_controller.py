@@ -131,4 +131,8 @@ class MainController:
         )
         
         if reply == QMessageBox.Yes:
+            # Đóng cửa sổ chính và quay lại màn đăng nhập
             self.view.close()
+            # Phát tín hiệu để ứng dụng biết cần quay lại login
+            if hasattr(self.view, 'logout_signal'):
+                self.view.logout_signal.emit()

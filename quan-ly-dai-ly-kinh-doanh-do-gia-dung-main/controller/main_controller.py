@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QMessageBox
 
 # Import UI classes
 from ui.employee_management import Ui_EmployeeManagement
@@ -32,8 +32,9 @@ from controller.inventory_report_controller import InventoryReportController
 class MainController:
     """Controller chính xử lý logic ứng dụng"""
     
-    def __init__(self, view):
+    def __init__(self, view, current_user):
         self.view = view
+        self.current_user = current_user
         self.modules = {}
         self.controllers = {}
         self.setup_modules()
@@ -87,6 +88,12 @@ class MainController:
         self.view.actionSupplierManagement.triggered.connect(lambda: self.show_module("supplier"))
         self.view.actionRevenueReport.triggered.connect(lambda: self.show_module("report"))
         self.view.actionInventoryReport.triggered.connect(lambda: self.show_module("inventory_report"))
+        
+        # Kết nối các action người dùng
+        if hasattr(self.view, 'actionChangePassword'):
+            self.view.actionChangePassword.triggered.connect(self.on_change_password)
+        if hasattr(self.view, 'actionLogout'):
+            self.view.actionLogout.triggered.connect(self.on_logout)
         self.view.actionExit.triggered.connect(self.view.close)
     
     def show_module(self, module_name):
@@ -106,3 +113,22 @@ class MainController:
                     self.controllers["order"].load_orders()
                 except Exception:
                     pass
+    
+    def on_change_password(self):
+        """Xử lý đổi mật khẩu"""
+        try:
+            if hasattr(self.view, 'show_change_password_dialog'):
+                self.view.show_change_password_dialog()
+        except Exception as e:
+            QMessageBox.warning(self.view, "Lỗi", f"Không thể mở dialog: {str(e)}")
+    
+    def on_logout(self):
+        """Xử lý đăng xuất"""
+        reply = QMessageBox.question(
+            self.view, "Xác nhận",
+            f"Bạn có chắc muốn đăng xuất?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.view.close()

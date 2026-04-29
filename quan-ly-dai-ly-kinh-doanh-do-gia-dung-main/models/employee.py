@@ -270,3 +270,31 @@ class Employee:
             return delta.days
         except:
             return 0
+
+    @classmethod
+    def get_by_username(cls, username):
+        """Lấy nhân viên theo username"""
+        if not username:
+            return None
+        row = Database.execute(
+            """SELECT employee_id, full_name, gender, birth_date, phone, email,
+                      identity_card, address, hire_date, role, base_salary,
+                      commission_rate, username, password, status, note, avatar,
+                      created_at, updated_at FROM employees WHERE username = ?""",
+            (username,),
+            fetch_one=True,
+        )
+        return cls(*row) if row else None
+
+    def update_password(self, new_password):
+        """Cập nhật mật khẩu nhân viên"""
+        if not new_password:
+            return False
+        self.password = new_password
+        self.updated_at = datetime.now().isoformat()
+        Database.execute(
+            "UPDATE employees SET password = ?, updated_at = ? WHERE employee_id = ?",
+            (new_password, self.updated_at, self.employee_id),
+            commit=True,
+        )
+        return True

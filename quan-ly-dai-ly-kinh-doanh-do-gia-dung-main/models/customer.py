@@ -80,6 +80,26 @@ class Customer:
         return cls(*row) if row else None
 
     @classmethod
+    def get_by_name(cls, name):
+        """Tìm khách hàng theo tên (trả về khách hàng đầu tiên tìm được)"""
+        row = Database.execute(
+            "SELECT customer_id, name, phone, email, address, points, notes, created_date FROM customers WHERE LOWER(name) = LOWER(?)",
+            (name,),
+            fetch_one=True,
+        )
+        return cls(*row) if row else None
+
+    @classmethod
+    def get_all_by_name(cls, name):
+        """Tìm tất cả khách hàng có tên giống nhau"""
+        rows = Database.execute(
+            "SELECT customer_id, name, phone, email, address, points, notes, created_date FROM customers WHERE LOWER(name) = LOWER(?) ORDER BY phone",
+            (name,),
+            fetch_all=True,
+        )
+        return [cls(*row) for row in rows]
+
+    @classmethod
     def search(cls, keyword):
         keyword = f"%{keyword.lower()}%"
         rows = Database.execute(

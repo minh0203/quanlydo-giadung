@@ -88,6 +88,10 @@ class Employee:
         employee_id = cls.generate_employee_id()
         now = datetime.now().isoformat()
         
+        # Chuyển đổi string rỗng thành None cho các trường UNIQUE để tránh vi phạm constraint
+        username = username if username.strip() else None
+        password = password if password else ""
+        
         Database.execute(
             """INSERT INTO employees 
                (employee_id, full_name, gender, birth_date, phone, email,
@@ -103,7 +107,7 @@ class Employee:
         )
         return cls(employee_id, full_name, gender, birth_date, phone, email,
                    identity_card, address, hire_date, role, base_salary,
-                   commission_rate, username, password, status, note, avatar, now, now)
+                   commission_rate, username if username else "", password, status, note, avatar, now, now)
 
     @classmethod
     def get_all(cls):
@@ -217,6 +221,10 @@ class Employee:
     def update(self):
         """Cập nhật nhân viên"""
         self.updated_at = datetime.now().isoformat()
+        
+        # Chuyển đổi string rỗng thành None cho các trường UNIQUE để tránh vi phạm constraint
+        username = self.username if self.username and self.username.strip() else None
+        
         Database.execute(
             """UPDATE employees SET
                    full_name = ?, gender = ?, birth_date = ?, phone = ?, email = ?,
@@ -226,7 +234,7 @@ class Employee:
                WHERE employee_id = ?""",
             (self.full_name, self.gender, self.birth_date, self.phone, self.email,
              self.identity_card, self.address, self.hire_date, self.role,
-             self.base_salary, self.commission_rate, self.username, self.password,
+             self.base_salary, self.commission_rate, username, self.password,
              self.status, self.note, self.avatar, self.updated_at, self.employee_id),
             commit=True,
         )

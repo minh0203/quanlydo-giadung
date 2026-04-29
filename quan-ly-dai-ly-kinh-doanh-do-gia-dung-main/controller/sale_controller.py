@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QInputDialog
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QInputDialog, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
 from PyQt5.QtWidgets import QAbstractItemView
 from PyQt5.QtCore import Qt
 from models.product import Product
 from models.order import Order
+from models.customer import Customer
 
 
 class SaleController:
@@ -204,6 +205,73 @@ class SaleController:
             self.cart.clear()
             self.refresh_cart_table()
 
+    def select_customer(self, customer_name):
+        """Chọn khách hàng khi có nhiều khách cùng tên
+        Trả về (customer, customer_phone) hoặc (None, "")"""
+        customers = Customer.get_all_by_name(customer_name)
+        
+        if len(customers) == 0:
+            # Không tìm thấy khách hàng, hỏi có nhập SĐT không
+            reply = QMessageBox.question(
+                None,
+                "Khách hàng không tồn tại",
+                f"Không tìm thấy khách hàng tên '{customer_name}'.\n\nBạn có muốn nhập SĐT để tìm khách hàng không?",
+                QMessageBox.Yes | QMessageBox.No,
+            )
+            if reply == QMessageBox.Yes:
+                phone, ok = QInputDialog.getText(None, "Tìm khách hàng", "Nhập SĐT khách hàng:")
+                if ok and phone.strip():
+                    phone = phone.strip()
+                    # Tìm khách hàng theo SĐT
+                    all_customers = Customer.search(phone)
+                    for c in all_customers:
+                        if c.phone == phone:
+                            return c, phone
+            return None, ""
+        
+        elif len(customers) == 1:
+            # Chỉ có một khách hàng cùng tên
+            customer = customers[0]
+            return customer, customer.phone
+        
+        else:
+            # Có nhiều khách hàng cùng tên, hỏi người dùng chọn
+            dialog = QDialog(None)
+            dialog.setWindowTitle("Chọn khách hàng")
+            dialog.setGeometry(100, 100, 500, 300)
+            
+            layout = QVBoxLayout()
+            layout.addWidget(QLabel(f"Có {len(customers)} khách hàng tên '{customer_name}'.\nVui lòng chọn khách hàng:"))
+            
+            # Tạo button cho mỗi khách hàng
+            buttons = []
+            selected_customer = [None]  # Sử dụng list để lưu giữ giá trị trong scope
+            
+            def select(customer):
+                selected_customer[0] = customer
+                dialog.accept()
+            
+            for customer in customers:
+                btn_text = f"{customer.name} - SĐT: {customer.phone if customer.phone else 'Không có'}"
+                btn = QPushButton(btn_text)
+                btn.clicked.connect(lambda checked, c=customer: select(c))
+                buttons.append(btn)
+                layout.addWidget(btn)
+            
+            # Button Hủy
+            btn_cancel = QPushButton("Hủy")
+            btn_cancel.clicked.connect(dialog.reject)
+            layout.addWidget(btn_cancel)
+            
+            dialog.setLayout(layout)
+            result = dialog.exec_()
+            
+            if result == QDialog.Accepted and selected_customer[0]:
+                customer = selected_customer[0]
+                return customer, customer.phone
+            else:
+                return None, ""
+
     def checkout(self):
         if not self.cart:
             QMessageBox.warning(None, "Cảnh báo", "Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.")
@@ -216,22 +284,131 @@ class SaleController:
         if not ok or not customer_name.strip():
             return
 
-        # Nhập ID nhân viên (có thể lấy từ session sau này)
+        customer_name = customer_name.strip()
+        
+        # Tìm và chọn khách hàng (xử lý trường hợp có nhiều khách cùng tên)
+        customer, customer_phone = self.select_customer(customer_name)
+        if customer is None and not customer_phone:
+            # Nếu không tìm thấy, hỏi có tạo khách hàng mới không
+            reply = QMessageBox.question(
+                None,
+                "Tạo khách hàng mới",
+                f"Khách hàng '{customer_name}' không tồn tại.\n\nBạn có muốn tạo khách hàng mới không?",
+                QMessageBox.Yes | QMessageBox.No,
+            )
+            if reply == QMessageBox.Yes:
+                phone, ok = QInputDialog.getText(None, "Tạo khách hàng mới", "Nhập SĐT khách hàng (hoặc để trống):")
+                if ok:
+                    phone = phone.strip() if ok else ""
+                    Customer.create(customer_name, phone)
+                    customer_phone = phone
+                else:
+                    return
+            else:
+                return
+        
+        # Tính nợ cũ của khách hàng
+        old_debt = Order.get_customer_debt(customer_name)
+        
+        # Hiển thị thông tin khách hàng và nợ cũ
+        info_message = f"Tên khách hàng: {customer_name}\n"
+        if customer_phone:
+            info_message += f"SĐT: {customer_phone}\n"
+        if old_debt > 0:
+            info_message += f"Nợ cũ: {self.format_currency(old_debt)}\n"
+        info_message += f"Tổng hóa đơn hiện tại: {self.format_currency(total)}"
+        
+        # Nhập ID nhân viên
         employee_id, ok = QInputDialog.getText(None, "Thông tin nhân viên", "Nhập ID nhân viên:")
         if not ok or not employee_id.strip():
             return
 
+        employee_id = employee_id.strip()
+        
+        # Xử lý thanh toán nợ cũ
+        amount_paid_for_old_debt = 0
+        if old_debt > 0:
+            reply = QMessageBox.question(
+                None,
+                "Thanh toán nợ cũ",
+                f"{info_message}\n\nKhách hàng có nợ: {self.format_currency(old_debt)}\n\nBạn có muốn khách hàng thanh toán nợ cũ không?",
+                QMessageBox.Yes | QMessageBox.No,
+            )
+            if reply == QMessageBox.Yes:
+                # Hỏi số tiền thanh toán cho nợ cũ
+                amount_str, ok = QInputDialog.getText(None, "Thanh toán nợ cũ", f"Nhập số tiền thanh toán nợ cũ (tối đa {self.format_currency(old_debt)}):")
+                if ok and amount_str.strip():
+                    try:
+                        amount_paid_for_old_debt = float(amount_str.replace(" VNĐ", "").replace(",", ""))
+                        if amount_paid_for_old_debt > old_debt:
+                            QMessageBox.warning(None, "Lỗi", f"Số tiền không thể vượt quá nợ cũ: {self.format_currency(old_debt)}")
+                            return
+                        if amount_paid_for_old_debt < 0:
+                            QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn 0")
+                            return
+                    except ValueError:
+                        QMessageBox.warning(None, "Lỗi", "Vui lòng nhập số tiền hợp lệ")
+                        return
+        
+        # Nhập số tiền trả cho hóa đơn hiện tại
+        amount_paid_str, ok = QInputDialog.getText(
+            None, 
+            "Thanh toán hóa đơn hiện tại", 
+            f"Nhập số tiền khách hàng trả (Tổng: {self.format_currency(total)}):"
+        )
+        if not ok or not amount_paid_str.strip():
+            return
+        
+        try:
+            amount_paid = float(amount_paid_str.replace(" VNĐ", "").replace(",", ""))
+            if amount_paid < 0:
+                QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn hoặc bằng 0")
+                return
+        except ValueError:
+            QMessageBox.warning(None, "Lỗi", "Vui lòng nhập số tiền hợp lệ")
+            return
+        
+        # Tính nợ mới từ hóa đơn hiện tại
+        debt_current_order = max(0, total - amount_paid)
+        
+        # Xác nhận thanh toán
+        confirm_message = f"Xác nhận thanh toán:\n\n{info_message}"
+        confirm_message += f"\nSố tiền khách trả: {self.format_currency(amount_paid)}"
+        if debt_current_order > 0:
+            confirm_message += f"\nNợ từ hóa đơn này: {self.format_currency(debt_current_order)}"
+        if amount_paid_for_old_debt > 0:
+            confirm_message += f"\nThanh toán nợ cũ: {self.format_currency(amount_paid_for_old_debt)}"
+        confirm_message += f"\n\nBạn có muốn tiếp tục?"
+        
         reply = QMessageBox.question(
             None,
             "Xác nhận thanh toán",
-            f"Tên khách hàng: {customer_name}\nID nhân viên: {employee_id}\nTổng thanh toán: {self.format_currency(total)}\n\nBạn có muốn thanh toán?",
+            confirm_message,
             QMessageBox.Yes | QMessageBox.No,
         )
         if reply != QMessageBox.Yes:
             return
 
         try:
-            # Chuẩn bị dữ liệu items cho hóa đơn
+            # Thanh toán nợ cũ nếu có
+            if amount_paid_for_old_debt > 0:
+                unpaid_orders = Order.get_unpaid_orders(customer_name)
+                remaining_payment = amount_paid_for_old_debt
+                
+                for order in unpaid_orders:
+                    if remaining_payment <= 0:
+                        break
+                    current_debt = order.total_amount - order.paid_amount
+                    if remaining_payment >= current_debt:
+                        # Thanh toán hết hóa đơn này
+                        order.update_paid_amount(order.total_amount)
+                        remaining_payment -= current_debt
+                    else:
+                        # Thanh toán một phần hóa đơn này
+                        order.update_paid_amount(order.paid_amount + remaining_payment)
+                        remaining_payment = 0
+            
+            # Chuẩn bị dữ liệu items cho hóa đơn mới
             order_items = []
             for item in self.cart:
                 order_items.append({
@@ -242,8 +419,8 @@ class SaleController:
                     "total_price": item["product"].selling_price * item["quantity"]
                 })
 
-            # Tạo hóa đơn
-            order = Order.create(customer_name.strip(), "", employee_id.strip(), order_items, total)
+            # Tạo hóa đơn mới với số tiền đã thanh toán
+            order = Order.create(customer_name, customer_phone, employee_id, order_items, total, amount_paid)
 
             # Cập nhật số lượng sản phẩm
             for item in self.cart:
@@ -254,7 +431,18 @@ class SaleController:
             self.cart.clear()
             self.refresh_cart_table()
             self.load_products()
-            QMessageBox.information(None, "Thành công", f"Đã thanh toán hóa đơn thành công!\nMã hóa đơn: {order.order_number}")
+            
+            # Thông báo kết quả
+            message = f"Đã tạo hóa đơn thành công!\nMã hóa đơn: {order.order_number}\n\n"
+            message += f"Tổng: {self.format_currency(total)}\n"
+            message += f"Đã trả: {self.format_currency(amount_paid)}\n"
+            if debt_current_order > 0:
+                message += f"Nợ: {self.format_currency(debt_current_order)}"
+            else:
+                message += "Trạng thái: Đã thanh toán hết"
+            if amount_paid_for_old_debt > 0:
+                message += f"\n\nCũng thanh toán nợ cũ: {self.format_currency(amount_paid_for_old_debt)}"
+            QMessageBox.information(None, "Thành công", message)
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Thanh toán không thành công: {str(e)}")
 

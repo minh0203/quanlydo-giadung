@@ -91,14 +91,24 @@ class Order:
         return f"HD{new_num:03d}"
 
     @classmethod
-    def create(cls, customer_name, customer_phone, employee_id, items, total_amount):
+    def create(cls, customer_name, customer_phone, employee_id, items, total_amount, paid_amount=None):
+        if paid_amount is None:
+            paid_amount = total_amount
+        
+        # Xác định trạng thái dựa vào số tiền đã thanh toán
+        if paid_amount >= total_amount:
+            status = "Đã thanh toán"
+            paid_amount = total_amount  # Không được thanh toán quá tổng
+        else:
+            status = "Chưa thanh toán hết"
+        
         order_number = cls.generate_order_id()
         order_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         created_at = order_date
 
         Database.execute(
             "INSERT INTO orders (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, total_amount, "Đã thanh toán", created_at),
+            (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, status, created_at),
             commit=True,
         )
 
@@ -109,7 +119,7 @@ class Order:
                 commit=True,
             )
 
-        return cls(order_number, created_at, customer_name, customer_phone, total_amount, total_amount, "Đã thanh toán", employee_id, order_date, items)
+        return cls(order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, employee_id, order_date, items)
 
     @classmethod
     def get_all(cls):
@@ -147,6 +157,40 @@ class Order:
         )
         order.items = [{"product_id": item[0], "product_name": item[1], "quantity": item[2], "unit_price": item[3], "total_price": item[4]} for item in items]
         return order
+
+    @classmethod
+    def get_customer_debt(cls, customer_name):
+        """Tính tổng nợ cũ của khách hàng (từ các hóa đơn chưa thanh toán hết)"""
+        rows = Database.execute(
+            "SELECT SUM(total_amount - paid_amount) FROM orders WHERE customer_name = ? AND (total_amount - paid_amount) > 0",
+            (customer_name,),
+            fetch_one=True,
+        )
+        if rows and rows[0] is not None:
+            return rows[0]
+        return 0.0
+
+    @classmethod
+    def get_unpaid_orders(cls, customer_name):
+        """Lấy danh sách hóa đơn chưa thanh toán hết của khách hàng"""
+        rows = Database.execute(
+            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, order_date, employee_id FROM orders WHERE customer_name = ? AND (total_amount - paid_amount) > 0 ORDER BY created_at DESC",
+            (customer_name,),
+            fetch_all=True,
+        )
+        orders = []
+        for row in rows:
+            orders.append(cls(*row))
+        return orders
+
+    def update_paid_amount(self, paid_amount):
+        """Cập nhật số tiền đã thanh toán cho hóa đơn"""
+        Database.execute(
+            "UPDATE orders SET paid_amount = ? WHERE order_number = ?",
+            (paid_amount, self.order_number),
+            commit=True,
+        )
+        self.paid_amount = paid_amount
 
     def update_status(self, status):
         Database.execute(

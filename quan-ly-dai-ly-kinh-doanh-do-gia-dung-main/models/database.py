@@ -43,12 +43,18 @@ class Database:
         from .customer import Customer
         from .employee import Employee
         from .order import Order
+        from .warranty import Warranty
+        from .supplier import Supplier
+        from .import_order import ImportOrder
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
         Customer.create_table(cursor)
         Employee.create_table(cursor)
         Order.create_table(cursor)
+        Warranty.create_table(cursor)
+        Supplier.create_table(cursor)
+        ImportOrder.create_table(cursor)
         conn.commit()
         cursor.close()
         conn.close()

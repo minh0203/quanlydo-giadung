@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QAbstractItemView, QVBoxLayout, QLabel, QTextEdit, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt
 from models.order import Order
+from models.warranty import Warranty
 
 
 class OrderController:

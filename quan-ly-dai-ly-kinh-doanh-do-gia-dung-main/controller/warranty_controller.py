@@ -59,7 +59,7 @@ class WarrantyController:
 
         table = self.view.tableWarranties
         table.setRowCount(len(warranties))
-        table.setColumnCount(9)
+        table.setColumnCount(10)
         table.setHorizontalHeaderLabels([
             "Mã BH",
             "Ngày tiếp nhận",
@@ -67,6 +67,7 @@ class WarrantyController:
             "Serial/Mã SP",
             "Khách hàng",
             "SĐT",
+            "Mã hóa đơn",
             "Lỗi",
             "Trạng thái",
             "Thao tác"
@@ -79,12 +80,13 @@ class WarrantyController:
             table.setItem(row, 3, QTableWidgetItem(warranty.serial))
             table.setItem(row, 4, QTableWidgetItem(warranty.customer_name))
             table.setItem(row, 5, QTableWidgetItem(warranty.phone))
-            table.setItem(row, 6, QTableWidgetItem(warranty.error_description))
-            table.setItem(row, 7, QTableWidgetItem(warranty.status))
+            table.setItem(row, 6, QTableWidgetItem(warranty.order_id or ""))
+            table.setItem(row, 7, QTableWidgetItem(warranty.error_description))
+            table.setItem(row, 8, QTableWidgetItem(warranty.status))
 
             button = QPushButton("Xem")
             button.clicked.connect(lambda checked, code=warranty.warranty_code: self.load_warranty_by_code(code))
-            table.setCellWidget(row, 8, button)
+            table.setCellWidget(row, 9, button)
 
         table.resizeColumnsToContents()
 

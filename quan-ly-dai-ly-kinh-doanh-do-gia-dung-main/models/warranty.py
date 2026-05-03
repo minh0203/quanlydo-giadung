@@ -16,6 +16,7 @@ class Warranty:
     error_description: str
     note: str
     status: str = "Đang bảo hành"
+    order_id: str = ""  # Liên kết với mã hóa đơn
 
     @classmethod
     def create_table(cls, cursor):
@@ -35,7 +36,8 @@ class Warranty:
                     expiry_date TEXT,
                     error_description TEXT,
                     note TEXT,
-                    status TEXT NOT NULL DEFAULT 'Đang bảo hành'
+                    status TEXT NOT NULL DEFAULT 'Đang bảo hành',
+                    order_id TEXT
                 )
                 """
             )
@@ -61,6 +63,8 @@ class Warranty:
                 cursor.execute("ALTER TABLE warranties ADD COLUMN note TEXT")
             if "status" not in existing_columns:
                 cursor.execute("ALTER TABLE warranties ADD COLUMN status TEXT NOT NULL DEFAULT 'Đang bảo hành'")
+            if "order_id" not in existing_columns:
+                cursor.execute("ALTER TABLE warranties ADD COLUMN order_id TEXT")
 
     @classmethod
     def generate_warranty_code(cls):
@@ -81,20 +85,29 @@ class Warranty:
         return f"BH{max_num + 1:03d}"
 
     @classmethod
-    def create(cls, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status="Đang bảo hành"):
+    def create(cls, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status="Đang bảo hành", order_id=""):
         warranty_code = cls.generate_warranty_code()
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         Database.execute(
-            "INSERT INTO warranties (warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status),
+            "INSERT INTO warranties (warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id),
             commit=True,
         )
-        return cls(warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status)
+        return cls(warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id)
 
     @classmethod
     def get_all(cls):
         rows = Database.execute(
-            "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status FROM warranties ORDER BY created_at DESC",
+            "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id FROM warranties ORDER BY created_at DESC",
+            fetch_all=True,
+        )
+        return [cls(*row) for row in rows]
+
+    @classmethod
+    def get_by_order_id(cls, order_id):
+        rows = Database.execute(
+            "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id FROM warranties WHERE order_id = ? ORDER BY created_at DESC",
+            (order_id,),
             fetch_all=True,
         )
         return [cls(*row) for row in rows]
@@ -102,7 +115,7 @@ class Warranty:
     @classmethod
     def get_by_code(cls, warranty_code):
         row = Database.execute(
-            "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status FROM warranties WHERE warranty_code = ?",
+            "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id FROM warranties WHERE warranty_code = ?",
             (warranty_code,),
             fetch_one=True,
         )
@@ -112,8 +125,8 @@ class Warranty:
 
     def update(self):
         Database.execute(
-            "UPDATE warranties SET product = ?, serial = ?, customer_name = ?, phone = ?, purchase_date = ?, expiry_date = ?, error_description = ?, note = ?, status = ? WHERE warranty_code = ?",
-            (self.product, self.serial, self.customer_name, self.phone, self.purchase_date, self.expiry_date, self.error_description, self.note, self.status, self.warranty_code),
+            "UPDATE warranties SET product = ?, serial = ?, customer_name = ?, phone = ?, purchase_date = ?, expiry_date = ?, error_description = ?, note = ?, status = ?, order_id = ? WHERE warranty_code = ?",
+            (self.product, self.serial, self.customer_name, self.phone, self.purchase_date, self.expiry_date, self.error_description, self.note, self.status, self.order_id, self.warranty_code),
             commit=True,
         )
 
@@ -127,7 +140,7 @@ class Warranty:
 
     @classmethod
     def search_by_filters(cls, warranty_code="", customer="", status="", date_from="", date_to=""):
-        query = "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status FROM warranties WHERE 1=1"
+        query = "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id FROM warranties WHERE 1=1"
         params = []
 
         if warranty_code:

@@ -58,9 +58,10 @@ class SalaryController:
             month = self.view.spinMonth.value() if hasattr(self.view, "spinMonth") else datetime.now().month
             year = self.view.spinYear.value() if hasattr(self.view, "spinYear") else datetime.now().year
             
-            salaries = Salary.get_by_month(month, year) if month and year else Salary.get_all()
+            salaries = Salary.get_by_month_year(month, year) if month and year else Salary.get_all()
             self.display_salaries(salaries)
         except Exception as e:
+            print(f"Lỗi tải danh sách lương: {e}")
             QMessageBox.warning(None, "Lỗi", f"Không thể tải danh sách lương: {str(e)}")
 
     def display_salaries(self, salaries):
@@ -107,7 +108,7 @@ class SalaryController:
             year = self.view.spinYear.value() if hasattr(self.view, "spinYear") else datetime.now().year
             
             # Kiểm tra bảng lương đã tồn tại
-            existing = Salary.get_by_month(month, year)
+            existing = Salary.get_by_month_year(month, year)
             if any(s.employee_id == employee_id for s in existing):
                 QMessageBox.warning(None, "Cảnh báo", "Bảng lương tháng này đã tồn tại!")
                 return
@@ -117,18 +118,19 @@ class SalaryController:
                 QMessageBox.warning(None, "Lỗi", "Không tìm thấy nhân viên!")
                 return
 
-            overtime_hours = float(self.view.spinOvertimeHours.value()) if hasattr(self.view, "spinOvertimeHours") else 0
-            bonus = float(self.view.spinBonus.value()) if hasattr(self.view, "spinBonus") else 0
+            commission = float(self.view.spinBonus.value()) if hasattr(self.view, "spinBonus") else 0
+            allowance = float(self.view.spinAllowance.value()) if hasattr(self.view, "spinAllowance") else 0
             deduction = float(self.view.spinDeduction.value()) if hasattr(self.view, "spinDeduction") else 0
 
             # Tạo bảng lương
             salary = Salary.create(
                 employee_id=employee_id,
+                employee_name=emp.full_name,
                 month=month,
                 year=year,
                 base_salary=emp.base_salary,
-                overtime_hours=overtime_hours,
-                bonus=bonus,
+                commission=commission,
+                allowance=allowance,
                 deduction=deduction
             )
 
@@ -136,25 +138,38 @@ class SalaryController:
             self.load_salaries()
 
         except Exception as e:
+            print(f"Lỗi tính lương: {e}")
             QMessageBox.warning(None, "Lỗi", f"Không thể tính lương: {str(e)}")
 
     def approve_salary(self):
         """Phê duyệt bảng lương"""
         if not self.current_salary:
             QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn bảng lương!")
+            returnstatus != "Nháp":
+            QMessageBox.warning(None, "Cảnh báo", "Chỉ phê duyệt được bảng lương ở trạng thái 'Nháp'!")
             return
 
-        if self.current_salary.approve():
+        try:
+            self.current_salary.approve("admin")
             QMessageBox.information(None, "Thành công", "Đã phê duyệt bảng lương!")
             self.load_salaries()
+        except Exception as e:
+            print(f"Lỗi phê duyệt: {e}")
+            QMessageBox.warning(None, "Lỗi", f"Không thể phê duyệt: {str(e)}
         else:
             QMessageBox.warning(None, "Cảnh báo", "Chỉ phê duyệt được bảng lương ở trạng thái 'Nháp'!")
 
-    def pay_salary(self):
-        """Thanh toán bảng lương"""
-        if not self.current_salary:
-            QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn bảng lương!")
+    def pay_salary(self):status != "Phê duyệt":
+            QMessageBox.warning(None, "Cảnh báo", "Chỉ thanh toán được bảng lương đã phê duyệt!")
             return
+
+        try:
+            self.current_salary.pay()
+            QMessageBox.information(None, "Thành công", "Đã thanh toán bảng lương!")
+            self.load_salaries()
+        except Exception as e:
+            print(f"Lỗi thanh toán: {e}")
+            QMessageBox.warning(None, "Lỗi", f"Không thể thanh toán: {str(e)}
 
         if self.current_salary.pay():
             QMessageBox.information(None, "Thành công", "Đã thanh toán bảng lương!")
@@ -169,19 +184,7 @@ class SalaryController:
 
         current_row = self.view.tableSalaries.currentRow()
         if current_row >= 0:
-            salary_id = self.view.tableSalaries.item(current_row, 0).text()
-            self.current_salary = Salary.get_by_id(salary_id)
-
-    def export_excel(self):
-        """Xuất bảng lương ra Excel"""
-        try:
-            import openpyxl
-            from openpyxl.styles import Font, PatternFill
-
-            month = self.view.spinMonth.value() if hasattr(self.view, "spinMonth") else datetime.now().month
-            year = self.view.spinYear.value() if hasattr(self.view, "spinYear") else datetime.now().year
-            
-            salaries = Salary.get_by_month(month, year)
+            salary_id = self.view.tableSal_year(month, year)
             if not salaries:
                 QMessageBox.warning(None, "Cảnh báo", "Không có bảng lương để xuất!")
                 return
@@ -191,8 +194,8 @@ class SalaryController:
             ws.title = f"Lương {month}/{year}"
 
             # Header
-            headers = ["Mã", "Nhân viên", "Lương cơ bản", "Tăng ca", "Lương tăng ca",
-                      "Thưởng", "Khấu trừ", "Lương bruto", "Lương ròng", "Trạng thái"]
+            headers = ["Mã", "Nhân viên", "Lương cơ bản", "Commission", "Phụ cấp",
+                      "Khấu trừ", "Lương bruto", "Lương ròng", "Trạng thái"]
             for col, header in enumerate(headers, 1):
                 cell = ws.cell(row=1, column=col)
                 cell.value = header
@@ -201,16 +204,27 @@ class SalaryController:
 
             # Data
             for row_idx, salary in enumerate(salaries, 2):
-                emp = Employee.get_by_id(salary.employee_id)
                 ws.cell(row=row_idx, column=1).value = salary.salary_id
-                ws.cell(row=row_idx, column=2).value = emp.full_name if emp else salary.employee_id
+                ws.cell(row=row_idx, column=2).value = salary.employee_name
                 ws.cell(row=row_idx, column=3).value = salary.base_salary
-                ws.cell(row=row_idx, column=4).value = salary.overtime_hours
-                ws.cell(row=row_idx, column=5).value = salary.overtime_salary
-                ws.cell(row=row_idx, column=6).value = salary.bonus
-                ws.cell(row=row_idx, column=7).value = salary.deduction
-                ws.cell(row=row_idx, column=8).value = salary.gross_salary
-                ws.cell(row=row_idx, column=9).value = salary.net_salary
+                ws.cell(row=row_idx, column=4).value = salary.commission
+                ws.cell(row=row_idx, column=5).value = salary.allowance
+                ws.cell(row=row_idx, column=6).value = salary.deduction
+                ws.cell(row=row_idx, column=7).value = salary.gross_salary
+                ws.cell(row=row_idx, column=8).value = salary.net_salary
+                ws.cell(row=row_idx, column=9).value = salary.status
+
+            for column in ws.columns:
+                ws.column_dimensions[column[0].column_letter].width = 15
+
+            filename = f"luong_{month}_{year}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            wb.save(filename)
+            QMessageBox.information(None, "Thành công", f"Đã xuất file: {filename}")
+
+        except ImportError:
+            QMessageBox.warning(None, "Lỗi", "Vui lòng cài đặt: pip install openpyxl")
+        except Exception as e:
+            print(f"Lỗi xuất Excel: {e}")w_idx, column=9).value = salary.net_salary
                 ws.cell(row=row_idx, column=10).value = salary.status
 
             for column in ws.columns:

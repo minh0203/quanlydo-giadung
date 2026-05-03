@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QInputDialog, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
 from PyQt5.QtWidgets import QAbstractItemView
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 from models.product import Product
 from models.order import Order
 from models.customer import Customer
+from models.warranty import Warranty
 
 
 class SaleController:
@@ -428,6 +429,30 @@ class SaleController:
                 product.quantity -= item["quantity"]
                 product.update()
 
+            # Tự động tạo phiếu bảo hành cho mỗi sản phẩm mua
+            purchase_date = QDate.currentDate().toString("yyyy-MM-dd")
+            for item in self.cart:
+                product = item["product"]
+                try:
+                    # Tính ngày hết hạn bảo hành dựa trên warranty_months
+                    expiry_date = QDate.currentDate().addMonths(product.warranty_months).toString("yyyy-MM-dd")
+                    
+                    # Tạo phiếu bảo hành
+                    warranty = Warranty.create(
+                        product=product.name,
+                        serial=product.product_id,
+                        customer_name=customer_name,
+                        phone=customer_phone or "",
+                        purchase_date=purchase_date,
+                        expiry_date=expiry_date,
+                        error_description="",
+                        note=f"Tạo từ đơn hàng {order.order_number}",
+                        status="Đang bảo hành"
+                    )
+                except Exception as warranty_error:
+                    # Nếu lỗi tạo warranty, không dừng quy trình
+                    print(f"Cảnh báo: Không thể tạo bảo hành cho {product.name}: {str(warranty_error)}")
+
             self.cart.clear()
             self.refresh_cart_table()
             self.load_products()
@@ -442,6 +467,7 @@ class SaleController:
                 message += "Trạng thái: Đã thanh toán hết"
             if amount_paid_for_old_debt > 0:
                 message += f"\n\nCũng thanh toán nợ cũ: {self.format_currency(amount_paid_for_old_debt)}"
+            message += f"\n\n✓ Phiếu bảo hành đã được tạo tự động!"
             QMessageBox.information(None, "Thành công", message)
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Thanh toán không thành công: {str(e)}")

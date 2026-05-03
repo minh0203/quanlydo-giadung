@@ -1,5 +1,19 @@
 # main.py - Chỉ chạy app, logic xử lý ở controller
+import faulthandler
+faulthandler.enable()
 import sys
+import os
+from pathlib import Path
+
+# Thiết lập plugin path cho Qt (nhằm tránh crash khi Python/PyQt không tìm đúng plugin Windows)
+if sys.platform.startswith("win"):
+    venv_path = Path(sys.executable).resolve().parent.parent
+    plugin_path = venv_path / "Lib" / "site-packages" / "PyQt5" / "Qt5" / "plugins"
+    if plugin_path.exists():
+        os.environ["QT_PLUGIN_PATH"] = str(plugin_path)
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = str(plugin_path)
+        os.environ.setdefault("QT_QPA_PLATFORM", "windows")
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QDialog, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QDesktopWidget
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -252,21 +266,27 @@ class ChangePasswordDialog(QDialog):
             QMessageBox.warning(self, "Lỗi", f"Không thể reset mật khẩu: {str(e)}")
 
 
-class RegisterDialog(QDialog, Ui_RegisterDialog):
+class RegisterDialog(QDialog):
     """Màn hình đăng ký - logic xử lý ở controller"""
     def __init__(self, parent=None, login_callback=None):
         super().__init__(parent)
-        self.setupUi(self)
+        self.ui = Ui_RegisterDialog()
+        self.ui.setupUi(self)
+        for name, widget in self.ui.__dict__.items():
+            setattr(self, name, widget)
         self.login_callback = login_callback
         # Khởi tạo controller
         self.controller = RegisterAuthController(self)
 
 
-class LoginDialog(QDialog, Ui_LoginDialog):
+class LoginDialog(QDialog):
     """Màn hình đăng nhập - logic xử lý ở controller"""
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
+        self.ui = Ui_LoginDialog()
+        self.ui.setupUi(self)
+        for name, widget in self.ui.__dict__.items():
+            setattr(self, name, widget)
         # Khởi tạo controller
         self.controller = LoginAuthController(self)
     
@@ -283,13 +303,16 @@ class LoginDialog(QDialog, Ui_LoginDialog):
         dialog.exec()
 
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow):
     """Cửa sổ chính - logic xử lý ở controller"""
     logout_signal = pyqtSignal()  # Tín hiệu khi đăng xuất
     
     def __init__(self, current_user):
         super().__init__()
-        self.setupUi(self)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        for name, widget in self.ui.__dict__.items():
+            setattr(self, name, widget)
         self.current_user = current_user
         
         # Khởi tạo database
@@ -320,46 +343,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    
-    while True:
-        # Hiển thị màn đăng nhập
-        login = LoginDialog()
-        result = login.exec()
-        
-        if result == QDialog.Accepted:
-            import controller.auth_controller as auth_module
-            current_user_obj = auth_module.current_user
-            
-            if current_user_obj:
-                # Tạo cửa sổ chính
-                window = MainWindow(current_user_obj)
-                window.show()
-                
-                # Kết nối signal đăng xuất để quay lại login
-                logout_triggered = False
-                
-                def on_logout():
-                    nonlocal logout_triggered
-                    logout_triggered = True
-                    window.close()
-                
-                window.logout_signal.connect(on_logout)
-                
-                # Chạy ứng dụng
-                app.exec()
-                
-                # Nếu đăng xuất, tiếp tục vòng lặp để quay lại login
-                if logout_triggered:
-                    continue
-                else:
-                    # Nếu đóng cửa sổ chính (không phải đăng xuất), thoát ứng dụng
-                    break
-            else:
-                QMessageBox.warning(None, "Lỗi", "Không thể lấy thông tin người dùng!")
-                break
+
+    # Hiển thị màn đăng nhập
+    login = LoginDialog()
+    login.show()
+    login.raise_()
+    login.activateWindow()
+    result = login.exec()
+
+    if result == QDialog.Accepted:
+        import controller.auth_controller as auth_module
+        current_user_obj = auth_module.current_user
+
+        if current_user_obj:
+            # Tạo và hiển thị cửa sổ chính
+            window = MainWindow(current_user_obj)
+            window.show()
+            sys.exit(app.exec())
         else:
-            # Người dùng đóng dialog đăng nhập
-            break
+            QMessageBox.warning(None, "Lỗi", "Không thể lấy thông tin người dùng!")
+            sys.exit(1)
+    else:
+        # Người dùng đóng dialog đăng nhập
+        sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -46,6 +46,9 @@ class Database:
         from .warranty import Warranty
         from .supplier import Supplier
         from .import_order import ImportOrder
+        from .shift_schedule import ShiftScheduleEntry
+        from .salary import Salary
+        from .attendance import Attendance
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
@@ -55,6 +58,9 @@ class Database:
         Warranty.create_table(cursor)
         Supplier.create_table(cursor)
         ImportOrder.create_table(cursor)
+        ShiftScheduleEntry.create_table(cursor)
+        Salary.create_table(cursor)
+        Attendance.create_table(cursor)
         conn.commit()
         cursor.close()
         conn.close()

@@ -82,10 +82,34 @@ class Ui_ImportGoods(object):
 "        font-weight: bold;\n"
 "        color: #e74c3c;\n"
 "    }\n"
+"    QTabWidget::pane {\n"
+"        border: 1px solid #e1e8ed;\n"
+"    }\n"
+"    QTabBar::tab {\n"
+"        background-color: #ecf0f1;\n"
+"        color: #2c3e50;\n"
+"        padding: 8px 20px;\n"
+"        margin-right: 2px;\n"
+"    }\n"
+"    QTabBar::tab:selected {\n"
+"        background-color: #3498db;\n"
+"        color: white;\n"
+"    }\n"
 "   ")
         self.verticalLayout = QtWidgets.QVBoxLayout(ImportGoods)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.lblTitle = QtWidgets.QLabel(ImportGoods)
+        
+        # Create tab widget
+        self.tabWidget = QtWidgets.QTabWidget(ImportGoods)
+        self.tabWidget.setObjectName("tabWidget")
+        
+        # Tab 1: New Import
+        self.tabNewImport = QtWidgets.QWidget()
+        self.tabNewImport.setObjectName("tabNewImport")
+        self.layoutNewImport = QtWidgets.QVBoxLayout(self.tabNewImport)
+        self.layoutNewImport.setContentsMargins(10, 10, 10, 10)
+        
+        # Add title to tab 1
+        self.lblTitle = QtWidgets.QLabel(self.tabNewImport)
         font = QtGui.QFont()
         font.setPointSize(18)
         font.setBold(True)
@@ -93,10 +117,10 @@ class Ui_ImportGoods(object):
         self.lblTitle.setFont(font)
         self.lblTitle.setAlignment(QtCore.Qt.AlignCenter)
         self.lblTitle.setObjectName("lblTitle")
-        self.verticalLayout.addWidget(self.lblTitle)
+        self.layoutNewImport.addWidget(self.lblTitle)
         self.infoLayout = QtWidgets.QHBoxLayout()
         self.infoLayout.setObjectName("infoLayout")
-        self.groupBoxImportInfo = QtWidgets.QGroupBox(ImportGoods)
+        self.groupBoxImportInfo = QtWidgets.QGroupBox(self.tabNewImport)
         self.groupBoxImportInfo.setMinimumSize(QtCore.QSize(500, 0))
         self.groupBoxImportInfo.setObjectName("groupBoxImportInfo")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBoxImportInfo)
@@ -136,11 +160,30 @@ class Ui_ImportGoods(object):
         self.cboPaymentStatus.addItem("")
         self.cboPaymentStatus.addItem("")
         self.gridLayout.addWidget(self.cboPaymentStatus, 1, 4, 1, 1)
+        
+        # Payment amount fields - row 2
+        self.lblPaidAmount = QtWidgets.QLabel(self.groupBoxImportInfo)
+        self.lblPaidAmount.setObjectName("lblPaidAmount")
+        self.gridLayout.addWidget(self.lblPaidAmount, 2, 0, 1, 1)
+        self.txtPaidAmount = QtWidgets.QLineEdit(self.groupBoxImportInfo)
+        self.txtPaidAmount.setAlignment(QtCore.Qt.AlignRight)
+        self.txtPaidAmount.setObjectName("txtPaidAmount")
+        self.gridLayout.addWidget(self.txtPaidAmount, 2, 1, 1, 1)
+        
+        # Remaining debt field - row 3
+        self.lblRemainingDebt = QtWidgets.QLabel(self.groupBoxImportInfo)
+        self.lblRemainingDebt.setObjectName("lblRemainingDebt")
+        self.gridLayout.addWidget(self.lblRemainingDebt, 3, 0, 1, 1)
+        self.lblRemainingDebtValue = QtWidgets.QLabel(self.groupBoxImportInfo)
+        self.lblRemainingDebtValue.setStyleSheet("font-weight: bold; color: #e74c3c;")
+        self.lblRemainingDebtValue.setObjectName("lblRemainingDebtValue")
+        self.gridLayout.addWidget(self.lblRemainingDebtValue, 3, 1, 1, 1)
+        
         self.infoLayout.addWidget(self.groupBoxImportInfo)
         self.verticalLayout.addLayout(self.infoLayout)
         self.productSearchLayout = QtWidgets.QHBoxLayout()
         self.productSearchLayout.setObjectName("productSearchLayout")
-        self.groupBoxAddProduct = QtWidgets.QGroupBox(ImportGoods)
+        self.groupBoxAddProduct = QtWidgets.QGroupBox(self.tabNewImport)
         self.groupBoxAddProduct.setObjectName("groupBoxAddProduct")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBoxAddProduct)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -171,8 +214,8 @@ class Ui_ImportGoods(object):
         self.btnAddProduct.setObjectName("btnAddProduct")
         self.horizontalLayout.addWidget(self.btnAddProduct)
         self.productSearchLayout.addWidget(self.groupBoxAddProduct)
-        self.verticalLayout.addLayout(self.productSearchLayout)
-        self.tableImportItems = QtWidgets.QTableWidget(ImportGoods)
+        self.layoutNewImport.addLayout(self.productSearchLayout)
+        self.tableImportItems = QtWidgets.QTableWidget(self.tabNewImport)
         self.tableImportItems.setAlternatingRowColors(True)
         self.tableImportItems.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableImportItems.setObjectName("tableImportItems")
@@ -192,12 +235,12 @@ class Ui_ImportGoods(object):
         self.tableImportItems.setHorizontalHeaderItem(5, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableImportItems.setHorizontalHeaderItem(6, item)
-        self.verticalLayout.addWidget(self.tableImportItems)
+        self.layoutNewImport.addWidget(self.tableImportItems)
         self.summaryLayout = QtWidgets.QHBoxLayout()
         self.summaryLayout.setObjectName("summaryLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.summaryLayout.addItem(spacerItem)
-        self.lblTotalLabel = QtWidgets.QLabel(ImportGoods)
+        self.lblTotalLabel = QtWidgets.QLabel(self.tabNewImport)
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setBold(True)
@@ -205,27 +248,119 @@ class Ui_ImportGoods(object):
         self.lblTotalLabel.setFont(font)
         self.lblTotalLabel.setObjectName("lblTotalLabel")
         self.summaryLayout.addWidget(self.lblTotalLabel)
-        self.lblTotalAmount = QtWidgets.QLabel(ImportGoods)
+        self.lblTotalAmount = QtWidgets.QLabel(self.tabNewImport)
         self.lblTotalAmount.setObjectName("lblTotalAmount")
         self.summaryLayout.addWidget(self.lblTotalAmount)
-        self.verticalLayout.addLayout(self.summaryLayout)
+        self.layoutNewImport.addLayout(self.summaryLayout)
         self.buttonLayout = QtWidgets.QHBoxLayout()
         self.buttonLayout.setObjectName("buttonLayout")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.buttonLayout.addItem(spacerItem1)
-        self.btnSaveImport = QtWidgets.QPushButton(ImportGoods)
+        self.btnSaveImport = QtWidgets.QPushButton(self.tabNewImport)
         self.btnSaveImport.setMinimumSize(QtCore.QSize(150, 40))
         self.btnSaveImport.setObjectName("btnSaveImport")
         self.buttonLayout.addWidget(self.btnSaveImport)
-        self.btnClearCart = QtWidgets.QPushButton(ImportGoods)
+        self.btnClearCart = QtWidgets.QPushButton(self.tabNewImport)
         self.btnClearCart.setMinimumSize(QtCore.QSize(150, 40))
         self.btnClearCart.setObjectName("btnClearCart")
         self.buttonLayout.addWidget(self.btnClearCart)
-        self.btnPrintImport = QtWidgets.QPushButton(ImportGoods)
+        self.btnPrintImport = QtWidgets.QPushButton(self.tabNewImport)
         self.btnPrintImport.setMinimumSize(QtCore.QSize(150, 40))
         self.btnPrintImport.setObjectName("btnPrintImport")
         self.buttonLayout.addWidget(self.btnPrintImport)
-        self.verticalLayout.addLayout(self.buttonLayout)
+        self.layoutNewImport.addLayout(self.buttonLayout)
+        
+        # Tab 2: Import History
+        self.tabHistory = QtWidgets.QWidget()
+        self.tabHistory.setObjectName("tabHistory")
+        self.layoutHistory = QtWidgets.QVBoxLayout(self.tabHistory)
+        self.layoutHistory.setContentsMargins(10, 10, 10, 10)
+        
+        # Title for history tab
+        self.lblHistoryTitle = QtWidgets.QLabel(self.tabHistory)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        self.lblHistoryTitle.setFont(font)
+        self.lblHistoryTitle.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblHistoryTitle.setObjectName("lblHistoryTitle")
+        self.layoutHistory.addWidget(self.lblHistoryTitle)
+        
+        # Search and filter layout for history
+        self.historyFilterLayout = QtWidgets.QHBoxLayout()
+        self.historyFilterLayout.setObjectName("historyFilterLayout")
+        
+        self.lblSearchHistory = QtWidgets.QLabel(self.tabHistory)
+        self.lblSearchHistory.setObjectName("lblSearchHistory")
+        self.historyFilterLayout.addWidget(self.lblSearchHistory)
+        
+        self.txtSearchHistory = QtWidgets.QLineEdit(self.tabHistory)
+        self.txtSearchHistory.setObjectName("txtSearchHistory")
+        self.historyFilterLayout.addWidget(self.txtSearchHistory)
+        
+        self.btnSearchHistory = QtWidgets.QPushButton(self.tabHistory)
+        self.btnSearchHistory.setObjectName("btnSearchHistory")
+        self.historyFilterLayout.addWidget(self.btnSearchHistory)
+        
+        self.lblFilterStatus = QtWidgets.QLabel(self.tabHistory)
+        self.lblFilterStatus.setObjectName("lblFilterStatus")
+        self.historyFilterLayout.addWidget(self.lblFilterStatus)
+        
+        self.cboFilterStatus = QtWidgets.QComboBox(self.tabHistory)
+        self.cboFilterStatus.setMaximumWidth(200)
+        self.cboFilterStatus.setObjectName("cboFilterStatus")
+        self.historyFilterLayout.addWidget(self.cboFilterStatus)
+        
+        spacerHistory = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.historyFilterLayout.addItem(spacerHistory)
+        
+        self.btnRefreshHistory = QtWidgets.QPushButton(self.tabHistory)
+        self.btnRefreshHistory.setObjectName("btnRefreshHistory")
+        self.historyFilterLayout.addWidget(self.btnRefreshHistory)
+        
+        self.layoutHistory.addLayout(self.historyFilterLayout)
+        
+        # History table
+        self.tableHistoryImports = QtWidgets.QTableWidget(self.tabHistory)
+        self.tableHistoryImports.setAlternatingRowColors(True)
+        self.tableHistoryImports.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tableHistoryImports.setObjectName("tableHistoryImports")
+        self.tableHistoryImports.setColumnCount(9)
+        self.tableHistoryImports.setRowCount(0)
+        
+        # Add headers for history table
+        headers = ["ID", "Mã phiếu", "Ngày nhập", "NCC", "Số lượng SP", "Tổng tiền", "Số tiền nợ", "Thanh toán", "Thao tác"]
+        for col, header_text in enumerate(headers):
+            item = QtWidgets.QTableWidgetItem()
+            self.tableHistoryImports.setHorizontalHeaderItem(col, item)
+        
+        self.layoutHistory.addWidget(self.tableHistoryImports)
+        
+        # History buttons layout
+        self.historyButtonLayout = QtWidgets.QHBoxLayout()
+        self.historyButtonLayout.setObjectName("historyButtonLayout")
+        
+        spacerHistoryBtn = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.historyButtonLayout.addItem(spacerHistoryBtn)
+        
+        self.btnViewDetail = QtWidgets.QPushButton(self.tabHistory)
+        self.btnViewDetail.setMinimumSize(QtCore.QSize(150, 40))
+        self.btnViewDetail.setObjectName("btnViewDetail")
+        self.historyButtonLayout.addWidget(self.btnViewDetail)
+        
+        self.btnDeleteImport = QtWidgets.QPushButton(self.tabHistory)
+        self.btnDeleteImport.setMinimumSize(QtCore.QSize(150, 40))
+        self.btnDeleteImport.setObjectName("btnDeleteImport")
+        self.historyButtonLayout.addWidget(self.btnDeleteImport)
+        
+        self.layoutHistory.addLayout(self.historyButtonLayout)
+        
+        # Add tabs to tab widget
+        self.tabWidget.addTab(self.tabNewImport, "")
+        self.tabWidget.addTab(self.tabHistory, "")
+        
+        # Add tab widget to main layout
+        self.verticalLayout.addWidget(self.tabWidget)
 
         self.retranslateUi(ImportGoods)
 
@@ -242,6 +377,13 @@ class Ui_ImportGoods(object):
         self.cboPaymentStatus.setItemText(0, _translate("ImportGoods", "Chưa thanh toán"))
         self.cboPaymentStatus.setItemText(1, _translate("ImportGoods", "Đã thanh toán"))
         self.cboPaymentStatus.setItemText(2, _translate("ImportGoods", "Thanh toán một phần"))
+        
+        # Payment fields
+        self.lblPaidAmount.setText(_translate("ImportGoods", "Số tiền thanh toán:"))
+        self.txtPaidAmount.setPlaceholderText(_translate("ImportGoods", "VNĐ"))
+        self.lblRemainingDebt.setText(_translate("ImportGoods", "Còn nợ:"))
+        self.lblRemainingDebtValue.setText(_translate("ImportGoods", "0 VNĐ"))
+        
         self.groupBoxAddProduct.setTitle(_translate("ImportGoods", "Thêm sản phẩm"))
         self.lblProductSearch.setText(_translate("ImportGoods", "Tìm sản phẩm:"))
         self.txtProductSearch.setPlaceholderText(_translate("ImportGoods", "Nhập mã hoặc tên sản phẩm..."))
@@ -270,6 +412,48 @@ class Ui_ImportGoods(object):
         self.btnSaveImport.setText(_translate("ImportGoods", "💾 Lưu phiếu nhập"))
         self.btnClearCart.setText(_translate("ImportGoods", "🗑️ Xóa giỏ nhập"))
         self.btnPrintImport.setText(_translate("ImportGoods", "🖨️ In phiếu nhập"))
+        
+        # Tab names
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabNewImport), _translate("ImportGoods", "📝 Nhập Mới"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabHistory), _translate("ImportGoods", "📋 Lịch Sử Nhập"))
+        
+        # History tab translations
+        self.lblHistoryTitle.setText(_translate("ImportGoods", "📋 LỊCH SỬ NHẬP HÀNG"))
+        self.lblSearchHistory.setText(_translate("ImportGoods", "Tìm kiếm:"))
+        self.txtSearchHistory.setPlaceholderText(_translate("ImportGoods", "Nhập mã phiếu, NCC, ..."))
+        self.btnSearchHistory.setText(_translate("ImportGoods", "🔍 Tìm"))
+        self.lblFilterStatus.setText(_translate("ImportGoods", "Trạng thái:"))
+        self.btnRefreshHistory.setText(_translate("ImportGoods", "🔄 Làm mới"))
+        
+        # History table headers
+        item = self.tableHistoryImports.horizontalHeaderItem(0)
+        item.setText(_translate("ImportGoods", "ID"))
+        item = self.tableHistoryImports.horizontalHeaderItem(1)
+        item.setText(_translate("ImportGoods", "Mã phiếu"))
+        item = self.tableHistoryImports.horizontalHeaderItem(2)
+        item.setText(_translate("ImportGoods", "Ngày nhập"))
+        item = self.tableHistoryImports.horizontalHeaderItem(3)
+        item.setText(_translate("ImportGoods", "NCC"))
+        item = self.tableHistoryImports.horizontalHeaderItem(4)
+        item.setText(_translate("ImportGoods", "Số lượng SP"))
+        item = self.tableHistoryImports.horizontalHeaderItem(5)
+        item.setText(_translate("ImportGoods", "Tổng tiền"))
+        item = self.tableHistoryImports.horizontalHeaderItem(6)
+        item.setText(_translate("ImportGoods", "Số tiền nợ"))
+        item = self.tableHistoryImports.horizontalHeaderItem(7)
+        item.setText(_translate("ImportGoods", "Thanh toán"))
+        item = self.tableHistoryImports.horizontalHeaderItem(8)
+        item.setText(_translate("ImportGoods", "Thao tác"))
+        
+        # History buttons
+        self.btnViewDetail.setText(_translate("ImportGoods", "👁️ Xem Chi Tiết"))
+        self.btnDeleteImport.setText(_translate("ImportGoods", "🗑️ Xóa Phiếu"))
+        
+        # Filter status combo box
+        self.cboFilterStatus.addItem(_translate("ImportGoods", "Tất cả"))
+        self.cboFilterStatus.addItem(_translate("ImportGoods", "Chưa thanh toán"))
+        self.cboFilterStatus.addItem(_translate("ImportGoods", "Đã thanh toán"))
+        self.cboFilterStatus.addItem(_translate("ImportGoods", "Thanh toán một phần"))
 
 
 if __name__ == "__main__":

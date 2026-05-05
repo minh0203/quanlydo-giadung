@@ -90,6 +90,19 @@ class Supplier:
         return cls(*row) if row else None
 
     @classmethod
+    def get_by_name(cls, name):
+        row = Database.execute(
+            "SELECT supplier_id, name, phone, email, address, tax_code, contact_person, bank_account, bank_name, debt, status, note, created_at FROM suppliers WHERE LOWER(name) = ?",
+            (name.strip().lower(),),
+            fetch_one=True,
+        )
+        return cls(*row) if row else None
+
+    @classmethod
+    def exists(cls, name):
+        return cls.get_by_name(name) is not None
+
+    @classmethod
     def search(cls, keyword):
         keyword = f"%{keyword.lower()}%"
         rows = Database.execute(
@@ -103,6 +116,15 @@ class Supplier:
         Database.execute(
             "UPDATE suppliers SET name = ?, phone = ?, email = ?, address = ?, tax_code = ?, contact_person = ?, bank_account = ?, bank_name = ?, debt = ?, status = ?, note = ? WHERE supplier_id = ?",
             (self.name, self.phone, self.email, self.address, self.tax_code, self.contact_person, self.bank_account, self.bank_name, self.debt, self.status, self.note, self.supplier_id),
+            commit=True,
+        )
+
+    def update_debt(self, amount):
+        """Cập nhật số tiền nợ của nhà cung cấp"""
+        self.debt += amount
+        Database.execute(
+            "UPDATE suppliers SET debt = ? WHERE supplier_id = ?",
+            (self.debt, self.supplier_id),
             commit=True,
         )
 

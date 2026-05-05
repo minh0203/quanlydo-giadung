@@ -68,6 +68,7 @@ class SupplierController:
             "Mã NCC", "Tên nhà cung cấp", "SĐT", "Email", "Địa chỉ", "Mã số thuế", "Công nợ", "Trạng thái"
         ])
 
+        total_debt = 0.0
         for row, supplier in enumerate(suppliers):
             table.setItem(row, 0, QTableWidgetItem(supplier.supplier_id))
             table.setItem(row, 1, QTableWidgetItem(supplier.name))
@@ -77,8 +78,11 @@ class SupplierController:
             table.setItem(row, 5, QTableWidgetItem(supplier.tax_code))
             table.setItem(row, 6, QTableWidgetItem(f"{supplier.debt:,.0f} VNĐ"))
             table.setItem(row, 7, QTableWidgetItem(supplier.status))
+            total_debt += supplier.debt
 
         table.resizeColumnsToContents()
+        if hasattr(self.view, "lblTotalDebt"):
+            self.view.lblTotalDebt.setText(f"Tổng nợ hiện tại: {total_debt:,.0f} VNĐ")
 
     def on_supplier_selected(self):
         if not hasattr(self.view, "tableSuppliers"):
@@ -172,6 +176,12 @@ class SupplierController:
         note = self.view.txtNote.toPlainText().strip() if hasattr(self.view, "txtNote") else ""
 
         try:
+            # Check duplicate supplier by name
+            existing = Supplier.get_by_name(name)
+            if existing:
+                QMessageBox.warning(None, "Cảnh báo", "Nhà cung cấp này đã tồn tại. Vui lòng kiểm tra lại.")
+                return
+
             Supplier.create(name, phone, email, address, tax_code, contact_person, bank_account, bank_name, debt, status, note)
             QMessageBox.information(None, "Thành công", "Đã thêm nhà cung cấp thành công.")
             self.clear_form()
@@ -183,7 +193,8 @@ class SupplierController:
         if not self.current_supplier:
             QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn nhà cung cấp để cập nhật.")
             return
-        self.current_supplier.name = self.view.txtSupplierName.text().strip()
+        name = self.view.txtSupplierName.text().strip()
+        self.current_supplier.name = name
         self.current_supplier.phone = self.view.txtPhone.text().strip()
         self.current_supplier.email = self.view.txtEmail.text().strip()
         self.current_supplier.address = self.view.txtAddress.text().strip()
@@ -198,6 +209,11 @@ class SupplierController:
             self.current_supplier.debt = 0.0
         self.current_supplier.status = self.view.cboSupplierStatus.currentText() if hasattr(self.view, "cboSupplierStatus") else self.current_supplier.status
         self.current_supplier.note = self.view.txtNote.toPlainText().strip() if hasattr(self.view, "txtNote") else ""
+
+        existing = Supplier.get_by_name(name)
+        if existing and existing.supplier_id != self.current_supplier.supplier_id:
+            QMessageBox.warning(None, "Cảnh báo", "Tên nhà cung cấp này đã tồn tại. Vui lòng chọn tên khác.")
+            return
 
         try:
             self.current_supplier.update()

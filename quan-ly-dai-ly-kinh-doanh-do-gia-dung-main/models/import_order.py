@@ -11,6 +11,8 @@ class ImportOrder:
     import_date: str
     payment_status: str
     total_amount: float
+    paid_amount: float = 0.0
+    remaining_debt: float = 0.0
     note: str = ""
     created_at: str = ""
     items: list = None
@@ -29,11 +31,22 @@ class ImportOrder:
                     import_date TEXT,
                     payment_status TEXT,
                     total_amount REAL NOT NULL DEFAULT 0,
+                    paid_amount REAL NOT NULL DEFAULT 0,
+                    remaining_debt REAL NOT NULL DEFAULT 0,
                     note TEXT,
                     created_at TEXT NOT NULL
                 )
                 """
             )
+        else:
+            # Check if new columns exist, add them if not
+            cursor.execute("PRAGMA table_info(import_orders)")
+            columns = [column[1] for column in cursor.fetchall()]
+            if 'paid_amount' not in columns:
+                cursor.execute("ALTER TABLE import_orders ADD COLUMN paid_amount REAL NOT NULL DEFAULT 0")
+            if 'remaining_debt' not in columns:
+                cursor.execute("ALTER TABLE import_orders ADD COLUMN remaining_debt REAL NOT NULL DEFAULT 0")
+
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='import_items'")
         if cursor.fetchone() is None:
             cursor.execute(
@@ -70,12 +83,12 @@ class ImportOrder:
         return f"PN{max_num + 1:03d}"
 
     @classmethod
-    def create(cls, supplier_id, supplier_name, import_date, payment_status, total_amount, note, items):
+    def create(cls, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, items):
         import_number = cls.generate_import_number()
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         Database.execute(
-            "INSERT INTO import_orders (import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at),
+            "INSERT INTO import_orders (import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at),
             commit=True,
         )
 
@@ -86,12 +99,12 @@ class ImportOrder:
                 commit=True,
             )
 
-        return cls(import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at, items)
+        return cls(import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at, items)
 
     @classmethod
     def get_all(cls):
         rows = Database.execute(
-            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at FROM import_orders ORDER BY created_at DESC",
+            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at FROM import_orders ORDER BY created_at DESC",
             fetch_all=True,
         )
         orders = []
@@ -112,7 +125,7 @@ class ImportOrder:
     @classmethod
     def get_by_id(cls, import_number):
         row = Database.execute(
-            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at FROM import_orders WHERE import_number = ?",
+            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at FROM import_orders WHERE import_number = ?",
             (import_number,),
             fetch_one=True,
         )
@@ -131,10 +144,19 @@ class ImportOrder:
         return import_order
 
     @classmethod
+    def update_payment(cls, import_number, paid_amount, remaining_debt, payment_status):
+        """Cập nhật thông tin thanh toán của phiếu nhập"""
+        Database.execute(
+            "UPDATE import_orders SET paid_amount = ?, remaining_debt = ?, payment_status = ? WHERE import_number = ?",
+            (paid_amount, remaining_debt, payment_status, import_number),
+            commit=True,
+        )
+
+    @classmethod
     def search(cls, keyword):
         keyword = f"%{keyword.lower()}%"
         rows = Database.execute(
-            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, note, created_at FROM import_orders WHERE LOWER(import_number) LIKE ? OR LOWER(supplier_name) LIKE ? OR LOWER(payment_status) LIKE ? ORDER BY created_at DESC",
+            "SELECT import_number, supplier_id, supplier_name, import_date, payment_status, total_amount, paid_amount, remaining_debt, note, created_at FROM import_orders WHERE LOWER(import_number) LIKE ? OR LOWER(supplier_name) LIKE ? OR LOWER(payment_status) LIKE ? ORDER BY created_at DESC",
             (keyword, keyword, keyword),
             fetch_all=True,
         )

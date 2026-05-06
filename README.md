@@ -12,13 +12,12 @@ Phần mềm quản lý kinh doanh đồ gia dụng là giải pháp toàn diệ
 - Chủ cửa hàng kinh doanh đồ gia dụng
 - Nhân viên bán hàng
 - Nhân viên quản lý kho
-- Kế toán/Thu ngân
 
 ## ✨ Tính năng chính
 
 ### 🔐 Quản lý đăng nhập & Phân quyền
 - Đăng nhập với tài khoản/nhân khẩu
-- Phân quyền: Admin, Nhân viên bán hàng, Kho, Kế toán
+- Phân quyền: Admin, Nhân viên,  
 - Đổi mật khẩu, quên mật khẩu
 
 ### 📦 Quản lý sản phẩm
@@ -61,6 +60,6 @@ Phần mềm quản lý kinh doanh đồ gia dụng là giải pháp toàn diệ
 | Công nghệ | Vai trò |
 |-----------|---------|
 | **Python 3.10+** | Ngôn ngữ lập trình chính |
-| **PyQt6** | Xây dựng giao diện đồ họa (GUI) |
+| **PyQt5** | Xây dựng giao diện đồ họa (GUI) |
 | **QtDesigner** | Thiết kế giao diện trực quan kéo-thả |
 | **SQLite3** | Cơ sở dữ liệu nhúng (cho phiên bản Desktop) |

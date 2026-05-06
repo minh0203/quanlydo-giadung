@@ -15,8 +15,48 @@ class Warranty:
     expiry_date: str
     error_description: str
     note: str
-    status: str = "Đang bảo hành"
+    status: str = "Còn bảo hành"
     order_id: str = ""  # Liên kết với mã hóa đơn
+
+    @classmethod
+    def _normalize_status(cls, row):
+        if not row:
+            return row
+
+        warranty_code = row[0]
+        expiry_date = row[7]
+        status = row[10]
+
+        if expiry_date:
+            expiry = None
+            for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+                try:
+                    expiry = datetime.strptime(expiry_date, fmt).date()
+                    break
+                except ValueError:
+                    continue
+
+            if expiry:
+                if expiry < datetime.now().date() and status not in ("Hết bảo hành", "Đang sửa chữa", "Đã sửa xong", "Đã trả hàng"):
+                    Database.execute(
+                        "UPDATE warranties SET status = ? WHERE warranty_code = ?",
+                        ("Hết bảo hành", warranty_code),
+                        commit=True,
+                    )
+                    row = list(row)
+                    row[10] = "Hết bảo hành"
+                    return tuple(row)
+                if status == "Đang bảo hành":
+                    Database.execute(
+                        "UPDATE warranties SET status = ? WHERE warranty_code = ?",
+                        ("Còn bảo hành", warranty_code),
+                        commit=True,
+                    )
+                    row = list(row)
+                    row[10] = "Còn bảo hành"
+                    return tuple(row)
+
+        return row
 
     @classmethod
     def create_table(cls, cursor):
@@ -36,7 +76,7 @@ class Warranty:
                     expiry_date TEXT,
                     error_description TEXT,
                     note TEXT,
-                    status TEXT NOT NULL DEFAULT 'Đang bảo hành',
+                    status TEXT NOT NULL DEFAULT 'Còn bảo hành',
                     order_id TEXT
                 )
                 """
@@ -62,7 +102,7 @@ class Warranty:
             if "note" not in existing_columns:
                 cursor.execute("ALTER TABLE warranties ADD COLUMN note TEXT")
             if "status" not in existing_columns:
-                cursor.execute("ALTER TABLE warranties ADD COLUMN status TEXT NOT NULL DEFAULT 'Đang bảo hành'")
+                cursor.execute("ALTER TABLE warranties ADD COLUMN status TEXT NOT NULL DEFAULT 'Còn bảo hành'")
             if "order_id" not in existing_columns:
                 cursor.execute("ALTER TABLE warranties ADD COLUMN order_id TEXT")
 
@@ -85,7 +125,7 @@ class Warranty:
         return f"BH{max_num + 1:03d}"
 
     @classmethod
-    def create(cls, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status="Đang bảo hành", order_id=""):
+    def create(cls, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status="Còn bảo hành", order_id=""):
         warranty_code = cls.generate_warranty_code()
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         Database.execute(
@@ -101,6 +141,7 @@ class Warranty:
             "SELECT warranty_code, created_at, product, serial, customer_name, phone, purchase_date, expiry_date, error_description, note, status, order_id FROM warranties ORDER BY created_at DESC",
             fetch_all=True,
         )
+        rows = [cls._normalize_status(row) for row in rows]
         return [cls(*row) for row in rows]
 
     @classmethod
@@ -110,6 +151,7 @@ class Warranty:
             (order_id,),
             fetch_all=True,
         )
+        rows = [cls._normalize_status(row) for row in rows]
         return [cls(*row) for row in rows]
 
     @classmethod
@@ -121,6 +163,7 @@ class Warranty:
         )
         if not row:
             return None
+        row = cls._normalize_status(row)
         return cls(*row)
 
     def update(self):
@@ -153,8 +196,13 @@ class Warranty:
             params.append(f"%{customer}%")
 
         if status:
-            query += " AND status = ?"
-            params.append(status)
+            if status == "Còn bảo hành":
+                query += " AND (status IN (?, ?) AND (expiry_date IS NULL OR DATE(expiry_date) >= DATE('now')))"
+                params.append("Còn bảo hành")
+                params.append("Đang bảo hành")
+            else:
+                query += " AND status = ?"
+                params.append(status)
 
         if date_from:
             query += " AND DATE(created_at) >= DATE(?)"
@@ -167,4 +215,5 @@ class Warranty:
         query += " ORDER BY created_at DESC"
 
         rows = Database.execute(query, params, fetch_all=True)
+        rows = [cls._normalize_status(row) for row in rows]
         return [cls(*row) for row in rows]

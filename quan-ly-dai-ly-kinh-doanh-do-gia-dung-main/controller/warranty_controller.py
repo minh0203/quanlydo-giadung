@@ -115,6 +115,7 @@ class WarrantyController:
             serial = self.get_text_field("txtSerial")
             customer_name = self.get_text_field("txtCustomerName")
             phone = self.get_text_field("txtPhone")
+            status = self.get_combo_field("cboWarrantyStatus")
             purchase_date = self.get_date_field("datePurchase")
             expiry_date = self.get_date_field("dateExpiry")
             error_description = self.get_text_field("txtError")
@@ -135,6 +136,7 @@ class WarrantyController:
                 self.current_warranty.serial = serial
                 self.current_warranty.customer_name = customer_name
                 self.current_warranty.phone = phone
+                self.current_warranty.status = status
                 self.current_warranty.purchase_date = purchase_date
                 self.current_warranty.expiry_date = expiry_date
                 self.current_warranty.error_description = error_description
@@ -147,6 +149,7 @@ class WarrantyController:
                     serial=serial,
                     customer_name=customer_name,
                     phone=phone,
+                    status=status,
                     purchase_date=purchase_date,
                     expiry_date=expiry_date,
                     error_description=error_description,
@@ -211,6 +214,7 @@ class WarrantyController:
         self.set_text_field("txtSerial", "")
         self.set_text_field("txtCustomerName", "")
         self.set_text_field("txtPhone", "")
+        self.set_combo_field("cboWarrantyStatus", "Còn bảo hành")
         self.set_date_field("datePurchase", QDate.currentDate())
         self.set_date_field("dateExpiry", QDate.currentDate())
         self.set_text_field("txtError", "")
@@ -277,6 +281,7 @@ class WarrantyController:
         self.set_text_field("txtSerial", self.current_warranty.serial)
         self.set_text_field("txtCustomerName", self.current_warranty.customer_name)
         self.set_text_field("txtPhone", self.current_warranty.phone)
+        self.set_combo_field("cboWarrantyStatus", self.current_warranty.status)
         self.set_date_field("datePurchase", self.parse_date(self.current_warranty.purchase_date))
         self.set_date_field("dateExpiry", self.parse_date(self.current_warranty.expiry_date))
         self.set_text_field("txtError", self.current_warranty.error_description)

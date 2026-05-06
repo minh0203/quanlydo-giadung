@@ -447,7 +447,7 @@ class SaleController:
                         expiry_date=expiry_date,
                         error_description="",
                         note=f"Tạo từ đơn hàng {order.order_number}",
-                        status="Đang bảo hành",
+                        status="Còn bảo hành",
                         order_id=order.order_number
                     )
                 except Exception as warranty_error:

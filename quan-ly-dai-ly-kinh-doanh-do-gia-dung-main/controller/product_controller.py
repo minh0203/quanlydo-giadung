@@ -12,6 +12,7 @@ class ProductController:
         self.view = view
         self.current_product = None
         self.setup_connections()
+        self.refresh_product_categories()
         self.load_products()
 
     def setup_connections(self):
@@ -53,8 +54,37 @@ class ProductController:
         try:
             products = Product.get_all()
             self.display_products(products)
+            self.refresh_product_categories()
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Không thể tải danh sách sản phẩm: {str(e)}")
+
+    def refresh_product_categories(self):
+        """Nạp lại danh sách danh mục có sẵn từ dữ liệu sản phẩm"""
+        if not hasattr(self.view, "cboProductCategory"):
+            return
+
+        combo = self.view.cboProductCategory
+        current = combo.currentText().strip()
+        combo.blockSignals(True)
+        combo.clear()
+
+        default_categories = [
+            "Tủ lạnh", "Máy giặt", "TV", "Điều hòa",
+            "Bếp từ", "Quạt", "Máy hút bụi"
+        ]
+        categories = list(dict.fromkeys(default_categories + Product.get_categories()))
+
+        for category in categories:
+            combo.addItem(category)
+
+        if current:
+            index = combo.findText(current)
+            if index >= 0:
+                combo.setCurrentIndex(index)
+            else:
+                combo.setCurrentText(current)
+
+        combo.blockSignals(False)
 
     def display_products(self, products):
         """Hiển thị danh sách sản phẩm lên bảng"""

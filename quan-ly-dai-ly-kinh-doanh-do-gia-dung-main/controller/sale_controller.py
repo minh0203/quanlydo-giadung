@@ -58,6 +58,7 @@ class SaleController:
 
         if hasattr(self.view, "txtCustomerName"):
             self.view.txtCustomerName.textChanged.connect(self.update_payment_summary)
+            self.view.txtCustomerName.editingFinished.connect(self.on_customer_name_entered)
         if hasattr(self.view, "txtPaidAmount"):
             self.view.txtPaidAmount.textChanged.connect(self.update_payment_summary)
         if hasattr(self.view, "txtOldDebtPayment"):
@@ -152,8 +153,10 @@ class SaleController:
 
     def update_payment_summary(self):
         total = self.calculate_total()
+        vat = total * 0.10
+        grand_total = total + vat
         paid_amount = self.get_paid_amount()
-        debt = max(0.0, total - paid_amount)
+        debt = max(0.0, grand_total - paid_amount)
 
         if hasattr(self.view, "lblPaid"):
             self.view.lblPaid.setText(self.format_currency(paid_amount))
@@ -161,9 +164,9 @@ class SaleController:
             self.view.lblDebt.setText(self.format_currency(debt))
 
         status = "Chưa thanh toán"
-        if total == 0:
+        if grand_total == 0:
             status = "Chưa thanh toán"
-        elif paid_amount >= total:
+        elif paid_amount >= grand_total:
             status = "Đã thanh toán hết"
         else:
             status = "Còn nợ"
@@ -260,13 +263,23 @@ class SaleController:
             self.cart.clear()
             self.refresh_cart_table()
 
-    def select_customer(self, customer_name):
+    def select_customer(self, customer_name, customer_phone=""):
         """Chọn khách hàng khi có nhiều khách cùng tên
         Trả về (customer, customer_phone) hoặc (None, "")"""
         customers = Customer.get_all_by_name(customer_name)
-        
+
+        if customer_phone:
+            exact_customer = next((c for c in customers if c.phone == customer_phone), None)
+            if exact_customer:
+                return exact_customer, exact_customer.phone
+
         if len(customers) == 0:
-            # Không tìm thấy khách hàng, hỏi có nhập SĐT không
+            if customer_phone:
+                all_customers = Customer.search(customer_phone)
+                for c in all_customers:
+                    if c.phone == customer_phone:
+                        return c, c.phone
+
             reply = QMessageBox.question(
                 None,
                 "Khách hàng không tồn tại",
@@ -277,55 +290,86 @@ class SaleController:
                 phone, ok = QInputDialog.getText(None, "Tìm khách hàng", "Nhập SĐT khách hàng:")
                 if ok and phone.strip():
                     phone = phone.strip()
-                    # Tìm khách hàng theo SĐT
                     all_customers = Customer.search(phone)
                     for c in all_customers:
                         if c.phone == phone:
                             return c, phone
             return None, ""
-        
+
         elif len(customers) == 1:
-            # Chỉ có một khách hàng cùng tên
             customer = customers[0]
-            return customer, customer.phone
-        
+            return customer, customer.phone or customer_phone
+
         else:
-            # Có nhiều khách hàng cùng tên, hỏi người dùng chọn
+            if customer_phone:
+                exact_customer = next((c for c in customers if c.phone == customer_phone), None)
+                if exact_customer:
+                    return exact_customer, exact_customer.phone
+
             dialog = QDialog(None)
             dialog.setWindowTitle("Chọn khách hàng")
             dialog.setGeometry(100, 100, 500, 300)
-            
+
             layout = QVBoxLayout()
             layout.addWidget(QLabel(f"Có {len(customers)} khách hàng tên '{customer_name}'.\nVui lòng chọn khách hàng:"))
-            
-            # Tạo button cho mỗi khách hàng
-            buttons = []
-            selected_customer = [None]  # Sử dụng list để lưu giữ giá trị trong scope
-            
+
+            selected_customer = [None]
+
             def select(customer):
                 selected_customer[0] = customer
                 dialog.accept()
-            
+
             for customer in customers:
                 btn_text = f"{customer.name} - SĐT: {customer.phone if customer.phone else 'Không có'}"
                 btn = QPushButton(btn_text)
                 btn.clicked.connect(lambda checked, c=customer: select(c))
-                buttons.append(btn)
                 layout.addWidget(btn)
-            
-            # Button Hủy
+
             btn_cancel = QPushButton("Hủy")
             btn_cancel.clicked.connect(dialog.reject)
             layout.addWidget(btn_cancel)
-            
+
             dialog.setLayout(layout)
             result = dialog.exec_()
-            
+
             if result == QDialog.Accepted and selected_customer[0]:
                 customer = selected_customer[0]
                 return customer, customer.phone
             else:
                 return None, ""
+
+    def set_customer_code(self, customer):
+        if hasattr(self.view, "txtCustomerCode"):
+            self.view.txtCustomerCode.setText(customer.customer_id if customer else "")
+
+    def on_customer_name_entered(self):
+        if not hasattr(self.view, "txtCustomerName") or not hasattr(self.view, "txtCustomerPhone"):
+            return
+
+        customer_name = self.view.txtCustomerName.text().strip()
+        if not customer_name:
+            return
+
+        customer_phone = self.view.txtCustomerPhone.text().strip()
+        customers = Customer.get_all_by_name(customer_name)
+        if not customers:
+            self.set_customer_code(None)
+            return
+
+        if len(customers) == 1:
+            if not customer_phone and customers[0].phone:
+                self.view.txtCustomerPhone.setText(customers[0].phone)
+            self.set_customer_code(customers[0])
+            return
+
+        if len(customers) > 1 and not customer_phone:
+            customer, phone = self.select_customer(customer_name)
+            if customer:
+                self.view.txtCustomerName.setText(customer.name)
+                self.view.txtCustomerPhone.setText(phone or "")
+                self.set_customer_code(customer)
+            else:
+                self.set_customer_code(None)
 
     def checkout(self):
         if not self.cart:
@@ -353,7 +397,9 @@ class SaleController:
             QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn hoặc bằng 0.")
             return
 
-        customer, customer_phone_from_selection = self.select_customer(customer_name)
+        customer, customer_phone_from_selection = self.select_customer(customer_name, customer_phone)
+        if customer:
+            self.set_customer_code(customer)
         if customer is None and not customer_phone:
             reply = QMessageBox.question(
                 None,
@@ -381,14 +427,18 @@ class SaleController:
             QMessageBox.warning(None, "Lỗi", f"Số tiền thanh toán nợ cũ không thể vượt quá {self.format_currency(old_debt)}")
             return
 
-        debt_current_order = max(0.0, total - amount_paid)
+        vat = total * 0.10
+        grand_total = total + vat
+        debt_current_order = max(0.0, grand_total - amount_paid)
 
         info_message = f"Tên khách hàng: {customer_name}\n"
         if customer_phone:
             info_message += f"SĐT: {customer_phone}\n"
         if old_debt > 0:
             info_message += f"Nợ cũ: {self.format_currency(old_debt)}\n"
-        info_message += f"Tổng hóa đơn hiện tại: {self.format_currency(total)}"
+        info_message += f"Tổng hóa đơn: {self.format_currency(total)}\n"
+        info_message += f"Thuế VAT (10%): {self.format_currency(vat)}\n"
+        info_message += f"Thành tiền: {self.format_currency(grand_total)}"
 
         confirm_message = f"Xác nhận thanh toán:\n\n{info_message}"
         confirm_message += f"\nSố tiền khách trả: {self.format_currency(amount_paid)}"
@@ -432,7 +482,7 @@ class SaleController:
                     "total_price": item["product"].selling_price * item["quantity"]
                 })
 
-            order = Order.create(customer_name, customer_phone, employee_id, order_items, total, amount_paid)
+            order = Order.create(customer_name, customer_phone, employee_id, order_items, grand_total, amount_paid)
 
             for item in self.cart:
                 product = item["product"]
@@ -466,6 +516,8 @@ class SaleController:
                 self.view.txtCustomerName.clear()
             if hasattr(self.view, "txtCustomerPhone"):
                 self.view.txtCustomerPhone.clear()
+            if hasattr(self.view, "txtCustomerCode"):
+                self.view.txtCustomerCode.clear()
             if hasattr(self.view, "txtPaidAmount"):
                 self.view.txtPaidAmount.clear()
             if hasattr(self.view, "txtOldDebtPayment"):
@@ -474,6 +526,8 @@ class SaleController:
 
             message = f"Đã tạo hóa đơn thành công!\nMã hóa đơn: {order.order_number}\n\n"
             message += f"Tổng: {self.format_currency(total)}\n"
+            message += f"Thuế VAT (10%): {self.format_currency(vat)}\n"
+            message += f"Thành tiền: {self.format_currency(grand_total)}\n"
             message += f"Đã trả: {self.format_currency(amount_paid)}\n"
             if debt_current_order > 0:
                 message += f"Nợ: {self.format_currency(debt_current_order)}"
@@ -493,6 +547,14 @@ class SaleController:
 
     def calculate_total(self):
         return sum(item["product"].selling_price * item["quantity"] for item in self.cart)
+
+    def display_payment_summary(self, amount_paid, debt_current_order, status):
+        if hasattr(self.view, "lblPaid"):
+            self.view.lblPaid.setText(self.format_currency(amount_paid))
+        if hasattr(self.view, "lblDebt"):
+            self.view.lblDebt.setText(self.format_currency(debt_current_order))
+        if hasattr(self.view, "lblPaymentStatus"):
+            self.view.lblPaymentStatus.setText(status)
 
     def update_totals(self):
         total = self.calculate_total()

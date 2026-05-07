@@ -215,6 +215,7 @@ class Ui_ProductManagement(object):
         self.cboProductCategory = QtWidgets.QComboBox(self.groupBoxProductForm)
         self.cboProductCategory.setMinimumSize(QtCore.QSize(220, 40))
         self.cboProductCategory.setObjectName("cboProductCategory")
+        self.cboProductCategory.setEditable(True)
         self.cboProductCategory.addItem("")
         self.cboProductCategory.addItem("")
         self.cboProductCategory.addItem("")

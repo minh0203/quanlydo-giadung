@@ -79,6 +79,14 @@ class Product:
         return [cls(*row) for row in rows]
 
     @classmethod
+    def get_categories(cls):
+        rows = Database.execute(
+            "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category <> '' ORDER BY category",
+            fetch_all=True,
+        )
+        return [row[0] for row in rows]
+
+    @classmethod
     def get_by_id(cls, product_id):
         row = Database.execute(
             "SELECT product_id, name, category, brand, purchase_price, selling_price, quantity, unit, description, warranty_months FROM products WHERE product_id = ?",

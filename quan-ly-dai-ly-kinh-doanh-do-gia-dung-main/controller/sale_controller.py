@@ -10,13 +10,15 @@ from models.warranty import Warranty
 class SaleController:
     """Controller xử lý logic bán hàng"""
 
-    def __init__(self, view):
+    def __init__(self, view, current_user=None):
         self.view = view
+        self.current_user = current_user
         self.cart = []
         self.selected_product = None
         self.setup_connections()
         self.load_products()
         self.refresh_cart_table()
+        self.set_default_employee()
 
     def setup_connections(self):
         if hasattr(self.view, "btnSearchProduct"):
@@ -53,6 +55,13 @@ class SaleController:
 
         if hasattr(self.view, "btnCheckout"):
             self.view.btnCheckout.clicked.connect(self.checkout)
+
+        if hasattr(self.view, "txtCustomerName"):
+            self.view.txtCustomerName.textChanged.connect(self.update_payment_summary)
+        if hasattr(self.view, "txtPaidAmount"):
+            self.view.txtPaidAmount.textChanged.connect(self.update_payment_summary)
+        if hasattr(self.view, "txtOldDebtPayment"):
+            self.view.txtOldDebtPayment.textChanged.connect(self.update_payment_summary)
 
     def load_products(self):
         try:
@@ -118,6 +127,50 @@ class SaleController:
         self.on_product_selected()
         self.add_to_cart()
 
+    def set_default_employee(self):
+        if self.current_user and hasattr(self.view, "txtEmployeeId"):
+            self.view.txtEmployeeId.setText(self.current_user.employee_id)
+
+    def get_currency_value(self, text):
+        if not text:
+            return 0.0
+        try:
+            cleaned = text.replace(",", "").replace("VNĐ", "").replace(" ", "").strip()
+            return float(cleaned) if cleaned else 0.0
+        except ValueError:
+            return 0.0
+
+    def get_paid_amount(self):
+        if not hasattr(self.view, "txtPaidAmount"):
+            return 0.0
+        return self.get_currency_value(self.view.txtPaidAmount.text())
+
+    def get_old_debt_payment(self):
+        if not hasattr(self.view, "txtOldDebtPayment"):
+            return 0.0
+        return self.get_currency_value(self.view.txtOldDebtPayment.text())
+
+    def update_payment_summary(self):
+        total = self.calculate_total()
+        paid_amount = self.get_paid_amount()
+        debt = max(0.0, total - paid_amount)
+
+        if hasattr(self.view, "lblPaid"):
+            self.view.lblPaid.setText(self.format_currency(paid_amount))
+        if hasattr(self.view, "lblDebt"):
+            self.view.lblDebt.setText(self.format_currency(debt))
+
+        status = "Chưa thanh toán"
+        if total == 0:
+            status = "Chưa thanh toán"
+        elif paid_amount >= total:
+            status = "Đã thanh toán hết"
+        else:
+            status = "Còn nợ"
+
+        if hasattr(self.view, "lblPaymentStatus"):
+            self.view.lblPaymentStatus.setText(status)
+
     def add_to_cart(self):
         if not self.selected_product:
             QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn sản phẩm để thêm vào giỏ.")
@@ -178,6 +231,7 @@ class SaleController:
 
         table.resizeColumnsToContents()
         self.update_totals()
+        self.update_payment_summary()
 
     def remove_from_cart(self):
         if not hasattr(self.view, "tableCart"):
@@ -278,19 +332,29 @@ class SaleController:
             QMessageBox.warning(None, "Cảnh báo", "Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.")
             return
 
-        total = self.calculate_total()
-
-        # Nhập tên khách hàng
-        customer_name, ok = QInputDialog.getText(None, "Thông tin khách hàng", "Nhập tên khách hàng:")
-        if not ok or not customer_name.strip():
+        if not hasattr(self.view, "txtCustomerName") or not hasattr(self.view, "txtEmployeeId"):
+            QMessageBox.warning(None, "Lỗi", "Thiết lập thanh toán chưa đầy đủ.")
             return
 
-        customer_name = customer_name.strip()
-        
-        # Tìm và chọn khách hàng (xử lý trường hợp có nhiều khách cùng tên)
-        customer, customer_phone = self.select_customer(customer_name)
+        customer_name = self.view.txtCustomerName.text().strip()
+        customer_phone = self.view.txtCustomerPhone.text().strip() if hasattr(self.view, "txtCustomerPhone") else ""
+        employee_id = self.view.txtEmployeeId.text().strip()
+        amount_paid = self.get_paid_amount()
+        amount_paid_for_old_debt = self.get_old_debt_payment()
+        total = self.calculate_total()
+
+        if not customer_name:
+            QMessageBox.warning(None, "Cảnh báo", "Vui lòng nhập tên khách hàng.")
+            return
+        if not employee_id:
+            QMessageBox.warning(None, "Cảnh báo", "Vui lòng nhập ID nhân viên.")
+            return
+        if amount_paid < 0 or amount_paid_for_old_debt < 0:
+            QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn hoặc bằng 0.")
+            return
+
+        customer, customer_phone_from_selection = self.select_customer(customer_name)
         if customer is None and not customer_phone:
-            # Nếu không tìm thấy, hỏi có tạo khách hàng mới không
             reply = QMessageBox.question(
                 None,
                 "Tạo khách hàng mới",
@@ -300,79 +364,32 @@ class SaleController:
             if reply == QMessageBox.Yes:
                 phone, ok = QInputDialog.getText(None, "Tạo khách hàng mới", "Nhập SĐT khách hàng (hoặc để trống):")
                 if ok:
-                    phone = phone.strip() if ok else ""
+                    phone = phone.strip() if phone else ""
                     Customer.create(customer_name, phone)
                     customer_phone = phone
                 else:
                     return
             else:
                 return
-        
-        # Tính nợ cũ của khách hàng
+        elif customer is not None and not customer_phone:
+            customer_phone = customer_phone_from_selection
+
         old_debt = Order.get_customer_debt(customer_name)
-        
-        # Hiển thị thông tin khách hàng và nợ cũ
+        if old_debt <= 0:
+            amount_paid_for_old_debt = 0.0
+        elif amount_paid_for_old_debt > old_debt:
+            QMessageBox.warning(None, "Lỗi", f"Số tiền thanh toán nợ cũ không thể vượt quá {self.format_currency(old_debt)}")
+            return
+
+        debt_current_order = max(0.0, total - amount_paid)
+
         info_message = f"Tên khách hàng: {customer_name}\n"
         if customer_phone:
             info_message += f"SĐT: {customer_phone}\n"
         if old_debt > 0:
             info_message += f"Nợ cũ: {self.format_currency(old_debt)}\n"
         info_message += f"Tổng hóa đơn hiện tại: {self.format_currency(total)}"
-        
-        # Nhập ID nhân viên
-        employee_id, ok = QInputDialog.getText(None, "Thông tin nhân viên", "Nhập ID nhân viên:")
-        if not ok or not employee_id.strip():
-            return
 
-        employee_id = employee_id.strip()
-        
-        # Xử lý thanh toán nợ cũ
-        amount_paid_for_old_debt = 0
-        if old_debt > 0:
-            reply = QMessageBox.question(
-                None,
-                "Thanh toán nợ cũ",
-                f"{info_message}\n\nKhách hàng có nợ: {self.format_currency(old_debt)}\n\nBạn có muốn khách hàng thanh toán nợ cũ không?",
-                QMessageBox.Yes | QMessageBox.No,
-            )
-            if reply == QMessageBox.Yes:
-                # Hỏi số tiền thanh toán cho nợ cũ
-                amount_str, ok = QInputDialog.getText(None, "Thanh toán nợ cũ", f"Nhập số tiền thanh toán nợ cũ (tối đa {self.format_currency(old_debt)}):")
-                if ok and amount_str.strip():
-                    try:
-                        amount_paid_for_old_debt = float(amount_str.replace(" VNĐ", "").replace(",", ""))
-                        if amount_paid_for_old_debt > old_debt:
-                            QMessageBox.warning(None, "Lỗi", f"Số tiền không thể vượt quá nợ cũ: {self.format_currency(old_debt)}")
-                            return
-                        if amount_paid_for_old_debt < 0:
-                            QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn 0")
-                            return
-                    except ValueError:
-                        QMessageBox.warning(None, "Lỗi", "Vui lòng nhập số tiền hợp lệ")
-                        return
-        
-        # Nhập số tiền trả cho hóa đơn hiện tại
-        amount_paid_str, ok = QInputDialog.getText(
-            None, 
-            "Thanh toán hóa đơn hiện tại", 
-            f"Nhập số tiền khách hàng trả (Tổng: {self.format_currency(total)}):"
-        )
-        if not ok or not amount_paid_str.strip():
-            return
-        
-        try:
-            amount_paid = float(amount_paid_str.replace(" VNĐ", "").replace(",", ""))
-            if amount_paid < 0:
-                QMessageBox.warning(None, "Lỗi", "Số tiền phải lớn hơn hoặc bằng 0")
-                return
-        except ValueError:
-            QMessageBox.warning(None, "Lỗi", "Vui lòng nhập số tiền hợp lệ")
-            return
-        
-        # Tính nợ mới từ hóa đơn hiện tại
-        debt_current_order = max(0, total - amount_paid)
-        
-        # Xác nhận thanh toán
         confirm_message = f"Xác nhận thanh toán:\n\n{info_message}"
         confirm_message += f"\nSố tiền khách trả: {self.format_currency(amount_paid)}"
         if debt_current_order > 0:
@@ -380,7 +397,7 @@ class SaleController:
         if amount_paid_for_old_debt > 0:
             confirm_message += f"\nThanh toán nợ cũ: {self.format_currency(amount_paid_for_old_debt)}"
         confirm_message += f"\n\nBạn có muốn tiếp tục?"
-        
+
         reply = QMessageBox.question(
             None,
             "Xác nhận thanh toán",
@@ -391,25 +408,20 @@ class SaleController:
             return
 
         try:
-            # Thanh toán nợ cũ nếu có
             if amount_paid_for_old_debt > 0:
                 unpaid_orders = Order.get_unpaid_orders(customer_name)
                 remaining_payment = amount_paid_for_old_debt
-                
                 for order in unpaid_orders:
                     if remaining_payment <= 0:
                         break
                     current_debt = order.total_amount - order.paid_amount
                     if remaining_payment >= current_debt:
-                        # Thanh toán hết hóa đơn này
                         order.update_paid_amount(order.total_amount)
                         remaining_payment -= current_debt
                     else:
-                        # Thanh toán một phần hóa đơn này
                         order.update_paid_amount(order.paid_amount + remaining_payment)
                         remaining_payment = 0
-            
-            # Chuẩn bị dữ liệu items cho hóa đơn mới
+
             order_items = []
             for item in self.cart:
                 order_items.append({
@@ -420,25 +432,19 @@ class SaleController:
                     "total_price": item["product"].selling_price * item["quantity"]
                 })
 
-            # Tạo hóa đơn mới với số tiền đã thanh toán
             order = Order.create(customer_name, customer_phone, employee_id, order_items, total, amount_paid)
 
-            # Cập nhật số lượng sản phẩm
             for item in self.cart:
                 product = item["product"]
                 product.quantity -= item["quantity"]
                 product.update()
 
-            # Tự động tạo phiếu bảo hành cho mỗi sản phẩm mua
             purchase_date = QDate.currentDate().toString("yyyy-MM-dd")
             for item in self.cart:
                 product = item["product"]
                 try:
-                    # Tính ngày hết hạn bảo hành dựa trên warranty_months
                     expiry_date = QDate.currentDate().addMonths(product.warranty_months).toString("yyyy-MM-dd")
-                    
-                    # Tạo phiếu bảo hành
-                    warranty = Warranty.create(
+                    Warranty.create(
                         product=product.name,
                         serial=product.product_id,
                         customer_name=customer_name,
@@ -451,25 +457,37 @@ class SaleController:
                         order_id=order.order_number
                     )
                 except Exception as warranty_error:
-                    # Nếu lỗi tạo warranty, không dừng quy trình
                     print(f"Cảnh báo: Không thể tạo bảo hành cho {product.name}: {str(warranty_error)}")
 
             self.cart.clear()
             self.refresh_cart_table()
             self.load_products()
-            
-            # Thông báo kết quả
+            if hasattr(self.view, "txtCustomerName"):
+                self.view.txtCustomerName.clear()
+            if hasattr(self.view, "txtCustomerPhone"):
+                self.view.txtCustomerPhone.clear()
+            if hasattr(self.view, "txtPaidAmount"):
+                self.view.txtPaidAmount.clear()
+            if hasattr(self.view, "txtOldDebtPayment"):
+                self.view.txtOldDebtPayment.clear()
+            self.set_default_employee()
+
             message = f"Đã tạo hóa đơn thành công!\nMã hóa đơn: {order.order_number}\n\n"
             message += f"Tổng: {self.format_currency(total)}\n"
             message += f"Đã trả: {self.format_currency(amount_paid)}\n"
             if debt_current_order > 0:
                 message += f"Nợ: {self.format_currency(debt_current_order)}"
+                status = "Còn nợ"
             else:
                 message += "Trạng thái: Đã thanh toán hết"
+                status = "Đã thanh toán hết"
             if amount_paid_for_old_debt > 0:
                 message += f"\n\nCũng thanh toán nợ cũ: {self.format_currency(amount_paid_for_old_debt)}"
+                if status == "Còn nợ":
+                    status = "Thanh toán nợ cũ một phần"
             message += f"\n\n✓ Phiếu bảo hành đã được tạo tự động!"
             QMessageBox.information(None, "Thành công", message)
+            self.display_payment_summary(amount_paid, debt_current_order, status)
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Thanh toán không thành công: {str(e)}")
 

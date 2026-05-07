@@ -68,7 +68,10 @@ class MainController:
             
             # Tạo controller
             try:
-                self.controllers[name] = controller_class(ui)
+                if name == "sale":
+                    self.controllers[name] = controller_class(ui, current_user=self.current_user)
+                else:
+                    self.controllers[name] = controller_class(ui)
             except:
                 # Nếu controller chưa implement, tạo placeholder
                 self.controllers[name] = None

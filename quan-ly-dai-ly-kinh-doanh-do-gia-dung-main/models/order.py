@@ -11,6 +11,7 @@ class Order:
     customer_phone: str
     total_amount: float
     paid_amount: float
+    average_price: float = 0.0
     status: str = "Đã thanh toán"
     employee_id: str = ""
     order_date: str = ""
@@ -31,6 +32,7 @@ class Order:
                     order_date TEXT,
                     total_amount REAL NOT NULL DEFAULT 0,
                     paid_amount REAL NOT NULL DEFAULT 0,
+                    average_price REAL NOT NULL DEFAULT 0,
                     status TEXT NOT NULL DEFAULT 'Đã thanh toán',
                     created_at TEXT NOT NULL
                 )
@@ -48,6 +50,8 @@ class Order:
                 cursor.execute("ALTER TABLE orders ADD COLUMN order_date TEXT")
             if "paid_amount" not in existing_columns:
                 cursor.execute("ALTER TABLE orders ADD COLUMN paid_amount REAL NOT NULL DEFAULT 0")
+            if "average_price" not in existing_columns:
+                cursor.execute("ALTER TABLE orders ADD COLUMN average_price REAL NOT NULL DEFAULT 0")
             if "status" not in existing_columns:
                 cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'Đã thanh toán'")
             if "created_at" not in existing_columns:
@@ -94,21 +98,22 @@ class Order:
     def create(cls, customer_name, customer_phone, employee_id, items, total_amount, paid_amount=None):
         if paid_amount is None:
             paid_amount = total_amount
-        
-        # Xác định trạng thái dựa vào số tiền đã thanh toán
+
         if paid_amount >= total_amount:
             status = "Đã thanh toán"
-            paid_amount = total_amount  # Không được thanh toán quá tổng
+            paid_amount = total_amount
         else:
             status = "Chưa thanh toán hết"
-        
+
         order_number = cls.generate_order_id()
         order_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         created_at = order_date
+        total_quantity = sum(item["quantity"] for item in items)
+        average_price = total_amount / total_quantity if total_quantity > 0 else 0.0
 
         Database.execute(
-            "INSERT INTO orders (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, status, created_at),
+            "INSERT INTO orders (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, average_price, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (order_number, customer_name, customer_phone, employee_id, order_date, total_amount, paid_amount, average_price, status, created_at),
             commit=True,
         )
 
@@ -119,12 +124,12 @@ class Order:
                 commit=True,
             )
 
-        return cls(order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, employee_id, order_date, items)
+        return cls(order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, average_price, status, employee_id, order_date, items)
 
     @classmethod
     def get_all(cls):
         rows = Database.execute(
-            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, order_date, employee_id FROM orders ORDER BY created_at DESC",
+            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, average_price, status, order_date, employee_id FROM orders ORDER BY created_at DESC",
             fetch_all=True,
         )
         orders = []
@@ -142,7 +147,7 @@ class Order:
     @classmethod
     def get_by_id(cls, order_number):
         row = Database.execute(
-            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, order_date, employee_id FROM orders WHERE order_number = ?",
+            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, average_price, status, order_date, employee_id FROM orders WHERE order_number = ?",
             (order_number,),
             fetch_one=True,
         )
@@ -174,7 +179,7 @@ class Order:
     def get_unpaid_orders(cls, customer_name):
         """Lấy danh sách hóa đơn chưa thanh toán hết của khách hàng"""
         rows = Database.execute(
-            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, order_date, employee_id FROM orders WHERE customer_name = ? AND (total_amount - paid_amount) > 0 ORDER BY created_at DESC",
+            "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, average_price, status, order_date, employee_id FROM orders WHERE customer_name = ? AND (total_amount - paid_amount) > 0 ORDER BY created_at DESC",
             (customer_name,),
             fetch_all=True,
         )
@@ -203,32 +208,32 @@ class Order:
     @classmethod
     def search_by_filters(cls, order_number="", customer_name="", status="", date_from="", date_to=""):
         """Tìm kiếm hóa đơn theo các tiêu chí"""
-        query = "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, status, order_date, employee_id FROM orders WHERE 1=1"
+        query = "SELECT order_number, created_at, customer_name, customer_phone, total_amount, paid_amount, average_price, status, order_date, employee_id FROM orders WHERE 1=1"
         params = []
-        
+
         if order_number:
             query += " AND order_number LIKE ?"
             params.append(f"%{order_number}%")
-        
+
         if customer_name:
             query += " AND (customer_name LIKE ? OR customer_phone LIKE ?)"
             params.append(f"%{customer_name}%")
             params.append(f"%{customer_name}%")
-        
+
         if status:
             query += " AND status = ?"
             params.append(status)
-        
+
         if date_from:
             query += " AND DATE(created_at) >= DATE(?)"
             params.append(date_from)
-        
+
         if date_to:
             query += " AND DATE(created_at) <= DATE(?)"
             params.append(date_to)
-        
+
         query += " ORDER BY created_at DESC"
-        
+
         rows = Database.execute(query, params, fetch_all=True)
         orders = []
         for row in rows:

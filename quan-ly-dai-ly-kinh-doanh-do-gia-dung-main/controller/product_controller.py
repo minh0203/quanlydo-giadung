@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QPushButton, QComboBox, QTextEdit
 from PyQt5.QtCore import Qt
 from models.product import Product
@@ -5,7 +6,7 @@ from models.database import Database
 
 
 class ProductController:
-    """Controller x? l� logic qu?n l� s?n ph?m"""
+    """Controller xử lý logic quản lý sản phẩm"""
 
     def __init__(self, view):
         self.view = view
@@ -14,49 +15,49 @@ class ProductController:
         self.load_products()
 
     def setup_connections(self):
-        """Thi?t l?p k?t n?i c�c signal"""
-        # K?t n?i n�t th�m s?n ph?m
+        """Thiết lập kết nối các signal"""
+        # Kết nối nút thêm sản phẩm
         if hasattr(self.view, "btnAdd"):
             self.view.btnAdd.clicked.connect(self.show_add_form)
 
-        # K?t n?i n�t luu s?n ph?m
+        # Kết nối nút lưu sản phẩm
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.clicked.connect(self.save_product)
 
-        # K?t n?i n�t c?p nh?t s?n ph?m
+        # Kết nối nút cập nhật sản phẩm
         if hasattr(self.view, "btnEdit"):
             self.view.btnEdit.clicked.connect(self.edit_product)
 
-        # K?t n?i n�t x�a s?n ph?m
+        # Kết nối nút xóa sản phẩm
         if hasattr(self.view, "btnDelete"):
             self.view.btnDelete.clicked.connect(self.delete_product)
 
-        # K?t n?i n�t l�m m?i
+        # Kết nối nút làm mới
         if hasattr(self.view, "btnClear"):
             self.view.btnClear.clicked.connect(self.clear_form)
 
-        # K?t n?i n�t t�m ki?m
+        # Kết nối nút tìm kiếm
         if hasattr(self.view, "btnSearch"):
             self.view.btnSearch.clicked.connect(self.search_products)
 
-        # K?t n?i � t�m ki?m
+        # Kết nối ô tìm kiếm
         if hasattr(self.view, "txtSearch"):
             self.view.txtSearch.textChanged.connect(self.on_search_text_changed)
 
-        # K?t n?i b?ng s?n ph?m
+        # Kết nối bảng sản phẩm
         if hasattr(self.view, "tableProducts"):
             self.view.tableProducts.itemSelectionChanged.connect(self.on_product_selected)
 
     def load_products(self):
-        """T?i danh s�ch s?n ph?m"""
+        """Tải danh sách sản phẩm"""
         try:
             products = Product.get_all()
             self.display_products(products)
         except Exception as e:
-            QMessageBox.warning(None, "L?i", f"Kh�ng th? t?i danh s�ch s?n ph?m: {str(e)}")
+            QMessageBox.warning(None, "Lỗi", f"Không thể tải danh sách sản phẩm: {str(e)}")
 
     def display_products(self, products):
-        """Hi?n th? danh s�ch s?n ph?m l�n b?ng"""
+        """Hiển thị danh sách sản phẩm lên bảng"""
         if not hasattr(self.view, "tableProducts"):
             return
 
@@ -64,8 +65,8 @@ class ProductController:
         table.setRowCount(len(products))
         table.setColumnCount(8)
         table.setHorizontalHeaderLabels([
-            "M� SP", "T�n s?n ph?m", "Danh m?c", "Thuong hi?u",
-            "Gi� mua", "Gi� b�n", "S? lu?ng", "�on v?"
+            "Mã SP", "Tên sản phẩm", "Danh mục", "Thương hiệu",
+            "Giá mua", "Giá bán", "Số lượng", "Đơn vị"
         ])
 
         for row, product in enumerate(products):
@@ -73,19 +74,19 @@ class ProductController:
             table.setItem(row, 1, QTableWidgetItem(product.name))
             table.setItem(row, 2, QTableWidgetItem(product.category))
             table.setItem(row, 3, QTableWidgetItem(product.brand))
-            table.setItem(row, 4, QTableWidgetItem(f"{product.purchase_price:,.0f} VN�"))
-            table.setItem(row, 5, QTableWidgetItem(f"{product.selling_price:,.0f} VN�"))
+            table.setItem(row, 4, QTableWidgetItem(f"{product.purchase_price:,.0f} VNĐ"))
+            table.setItem(row, 5, QTableWidgetItem(f"{product.selling_price:,.0f} VNĐ"))
             table.setItem(row, 6, QTableWidgetItem(str(product.quantity)))
             table.setItem(row, 7, QTableWidgetItem(product.unit))
 
-        # �i?u ch?nh k�ch thu?c c?t
+        # Điều chỉnh kích thước cột
         table.resizeColumnsToContents()
 
     def show_add_form(self):
-        """Hi?n th? form th�m s?n ph?m m?i"""
+        """Hiển thị form thêm sản phẩm mới"""
         self.clear_form()
         self.current_product = None
-        # Disable m� s?n ph?m v� t? d?ng t?o
+        # Disable mã sản phẩm và tự động tạo
         self.set_field_enabled("txtProductCode", False)
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.setEnabled(True)
@@ -93,9 +94,9 @@ class ProductController:
             self.view.btnEdit.setEnabled(False)
 
     def save_product(self):
-        """Luu s?n ph?m (th�m m?i ho?c c?p nh?t)"""
+        """Lưu sản phẩm (thêm mới hoặc cập nhật)"""
         try:
-            # L?y d? li?u t? form
+            # Lấy dữ liệu từ form
             name = self.get_text_field("txtProductName")
             category = self.get_combo_field("cboProductCategory")
             brand = self.get_text_field("txtBrand")
@@ -105,13 +106,13 @@ class ProductController:
             unit = self.get_combo_field("cboUnit")
             description = self.get_text_field("txtDescription")
 
-            # Ki?m tra d? li?u b?t bu?c
+            # Kiểm tra dữ liệu bắt buộc
             if not name:
-                QMessageBox.warning(None, "C?nh b�o", "Vui l�ng nh?p t�n s?n ph?m!")
+                QMessageBox.warning(None, "Cảnh báo", "Vui lòng nhập tên sản phẩm!")
                 return
 
             if self.current_product:
-                # C?p nh?t s?n ph?m hi?n t?i
+                # Cập nhật sản phẩm hiện tại
                 self.current_product.name = name
                 self.current_product.category = category
                 self.current_product.brand = brand
@@ -122,9 +123,9 @@ class ProductController:
                 self.current_product.description = description
 
                 self.current_product.update()
-                QMessageBox.information(None, "Th�nh c�ng", "�� c?p nh?t s?n ph?m th�nh c�ng!")
+                QMessageBox.information(None, "Thành công", "Đã cập nhật sản phẩm thành công!")
             else:
-                # T?o s?n ph?m m?i
+                # Tạo sản phẩm mới
                 product = Product.create(
                     name=name,
                     category=category,
@@ -135,68 +136,68 @@ class ProductController:
                     unit=unit,
                     description=description
                 )
-                QMessageBox.information(None, "Th�nh c�ng", f"�� th�m s?n ph?m th�nh c�ng! M� s?n ph?m: {product.product_id}")
+                QMessageBox.information(None, "Thành công", f"Đã thêm sản phẩm thành công! Mã sản phẩm: {product.product_id}")
 
             self.clear_form()
             self.load_products()
 
         except Exception as e:
-            QMessageBox.warning(None, "L?i", f"Kh�ng th? luu s?n ph?m: {str(e)}")
+            QMessageBox.warning(None, "Lỗi", f"Không thể lưu sản phẩm: {str(e)}")
 
     def edit_product(self):
-        """Ch?nh s?a s?n ph?m du?c ch?n"""
+        """Chỉnh sửa sản phẩm được chọn"""
         if not self.current_product:
-            QMessageBox.warning(None, "C?nh b�o", "Vui l�ng ch?n s?n ph?m c?n ch?nh s?a!")
+            QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn sản phẩm cần chỉnh sửa!")
             return
 
-        # Enable c�c field d? ch?nh s?a
-        self.set_field_enabled("txtProductCode", False)  # Kh�ng cho s?a m� s?n ph?m
+        # Enable các field để chỉnh sửa
+        self.set_field_enabled("txtProductCode", False)  # Không cho sửa mã sản phẩm
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.setEnabled(True)
         if hasattr(self.view, "btnEdit"):
             self.view.btnEdit.setEnabled(False)
 
     def delete_product(self):
-        """X�a s?n ph?m"""
+        """Xóa sản phẩm"""
         if not self.current_product:
-            QMessageBox.warning(None, "C?nh b�o", "Vui l�ng ch?n s?n ph?m c?n x�a!")
+            QMessageBox.warning(None, "Cảnh báo", "Vui lòng chọn sản phẩm cần xóa!")
             return
 
         reply = QMessageBox.question(
-            None, "X�c nh?n",
-            f"B?n c� ch?c mu?n x�a s?n ph?m \'{self.current_product.name}\'?",
+            None, "Xác nhận",
+            f"Bạn có chắc muốn xóa sản phẩm '{self.current_product.name}'?",
             QMessageBox.Yes | QMessageBox.No
         )
 
         if reply == QMessageBox.Yes:
             try:
                 self.current_product.delete()
-                QMessageBox.information(None, "Th�nh c�ng", "�� x�a s?n ph?m th�nh c�ng!")
+                QMessageBox.information(None, "Thành công", "Đã xóa sản phẩm thành công!")
                 self.clear_form()
                 self.load_products()
             except Exception as e:
-                QMessageBox.warning(None, "L?i", f"Kh�ng th? x�a s?n ph?m: {str(e)}")
+                QMessageBox.warning(None, "Lỗi", f"Không thể xóa sản phẩm: {str(e)}")
 
     def search_products(self):
-        """T�m ki?m s?n ph?m"""
+        """Tìm kiếm sản phẩm"""
         keyword = self.get_text_field("txtSearch").strip()
         if keyword:
             try:
                 products = Product.search(keyword)
                 self.display_products(products)
             except Exception as e:
-                QMessageBox.warning(None, "L?i", f"Kh�ng th? t�m ki?m: {str(e)}")
+                QMessageBox.warning(None, "Lỗi", f"Không thể tìm kiếm: {str(e)}")
         else:
             self.load_products()
 
     def on_search_text_changed(self):
-        """X? l� khi text t�m ki?m thay d?i"""
+        """Xử lý khi text tìm kiếm thay đổi"""
         if hasattr(self.view, "txtSearch"):
             if not self.view.txtSearch.text().strip():
                 self.load_products()
 
     def on_product_selected(self):
-        """X? l� khi ch?n s?n ph?m t? b?ng"""
+        """Xử lý khi chọn sản phẩm từ bảng"""
         if not hasattr(self.view, "tableProducts"):
             return
 
@@ -208,7 +209,7 @@ class ProductController:
                 self.fill_form()
 
     def fill_form(self):
-        """�i?n d? li?u s?n ph?m v�o form"""
+        """Điền dữ liệu sản phẩm vào form"""
         if not self.current_product:
             return
 
@@ -222,14 +223,14 @@ class ProductController:
         self.set_combo_field("cboUnit", self.current_product.unit)
         self.set_text_field("txtDescription", self.current_product.description)
 
-        # Disable c�c n�t
+        # Disable các nút
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.setEnabled(False)
         if hasattr(self.view, "btnEdit"):
             self.view.btnEdit.setEnabled(True)
 
     def clear_form(self):
-        """X�a d? li?u trong form"""
+        """Xóa dữ liệu trong form"""
         self.set_text_field("txtProductCode", "")
         self.set_text_field("txtProductName", "")
         self.set_combo_field("cboProductCategory", "")
@@ -237,13 +238,13 @@ class ProductController:
         self.set_text_field("txtPurchasePrice", "0.0")
         self.set_text_field("txtSellingPrice", "0.0")
         self.set_text_field("txtQuantity", "0")
-        self.set_combo_field("cboUnit", "C�i")
+        self.set_combo_field("cboUnit", "Cái")
         self.set_text_field("txtDescription", "")
 
-        # Enable c�c field
+        # Enable các field
         self.set_field_enabled("txtProductCode", True)
 
-        # Reset tr?ng th�i n�t
+        # Reset trạng thái nút
         if hasattr(self.view, "btnSave"):
             self.view.btnSave.setEnabled(True)
         if hasattr(self.view, "btnEdit"):
@@ -253,7 +254,7 @@ class ProductController:
 
     # Helper methods
     def get_text_field(self, field_name):
-        """L?y text t? field"""
+        """Lấy text từ field"""
         if hasattr(self.view, field_name):
             field = getattr(self.view, field_name)
             if isinstance(field, QLineEdit):
@@ -265,7 +266,7 @@ class ProductController:
         return ""
 
     def set_text_field(self, field_name, value):
-        """�?t text cho field"""
+        """Đặt text cho field"""
         if hasattr(self.view, field_name):
             field = getattr(self.view, field_name)
             if isinstance(field, QLineEdit):
@@ -276,7 +277,7 @@ class ProductController:
                 field.setCurrentText(str(value))
 
     def get_combo_field(self, field_name):
-        """L?y gi� tr? t? combo box"""
+        """Lấy giá trị từ combo box"""
         if hasattr(self.view, field_name):
             field = getattr(self.view, field_name)
             if isinstance(field, QComboBox):
@@ -284,7 +285,7 @@ class ProductController:
         return ""
 
     def set_combo_field(self, field_name, value):
-        """�?t gi� tr? cho combo box"""
+        """Đặt giá trị cho combo box"""
         if hasattr(self.view, field_name):
             field = getattr(self.view, field_name)
             if isinstance(field, QComboBox):
@@ -301,7 +302,7 @@ class ProductController:
             field.setEnabled(enabled)
 
     def get_int_field(self, field_name):
-        """L?y gi� tr? int t? field"""
+        """Lấy giá trị int từ field"""
         text = self.get_text_field(field_name)
         try:
             return int(text) if text else 0
@@ -309,7 +310,7 @@ class ProductController:
             return 0
 
     def get_float_field(self, field_name):
-        """L?y gi� tr? float t? field"""
+        """Lấy giá trị float từ field"""
         text = self.get_text_field(field_name)
         try:
             return float(text) if text else 0.0

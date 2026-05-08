@@ -275,6 +275,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="lblAveragePrice">
+          <property name="text">
+           <string>Giá trung bình hiện tại: 0 VNĐ</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #e74c3c; font-weight: bold;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="btnAddProduct">
           <property name="text">
            <string>➕ Thêm vào phiếu</string>

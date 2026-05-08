@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QPushButton, QComboBox, QTextEdit
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QPushButton, QComboBox, QTextEdit, QLabel
 from PyQt5.QtCore import Qt
 from models.product import Product
 from models.database import Database
@@ -13,6 +13,7 @@ class ProductController:
         self.current_product = None
         self.setup_connections()
         self.refresh_product_categories()
+        self.create_profit_label()
         self.load_products()
 
     def setup_connections(self):
@@ -28,6 +29,11 @@ class ProductController:
         # Kết nối nút cập nhật sản phẩm
         if hasattr(self.view, "btnEdit"):
             self.view.btnEdit.clicked.connect(self.edit_product)
+
+        if hasattr(self.view, "txtPurchasePrice"):
+            self.view.txtPurchasePrice.textChanged.connect(self.update_profit_label)
+        if hasattr(self.view, "txtSellingPrice"):
+            self.view.txtSellingPrice.textChanged.connect(self.update_profit_label)
 
         # Kết nối nút xóa sản phẩm
         if hasattr(self.view, "btnDelete"):
@@ -93,24 +99,44 @@ class ProductController:
 
         table = self.view.tableProducts
         table.setRowCount(len(products))
-        table.setColumnCount(8)
+        table.setColumnCount(9)
         table.setHorizontalHeaderLabels([
             "Mã SP", "Tên sản phẩm", "Danh mục", "Thương hiệu",
-            "Giá mua", "Giá bán", "Số lượng", "Đơn vị"
+            "Giá mua", "Giá bán", "Lợi nhuận", "Tồn kho", "Đơn vị"
         ])
 
         for row, product in enumerate(products):
+            profit = product.selling_price - product.purchase_price
             table.setItem(row, 0, QTableWidgetItem(product.product_id))
             table.setItem(row, 1, QTableWidgetItem(product.name))
             table.setItem(row, 2, QTableWidgetItem(product.category))
             table.setItem(row, 3, QTableWidgetItem(product.brand))
             table.setItem(row, 4, QTableWidgetItem(f"{product.purchase_price:,.0f} VNĐ"))
             table.setItem(row, 5, QTableWidgetItem(f"{product.selling_price:,.0f} VNĐ"))
-            table.setItem(row, 6, QTableWidgetItem(str(product.quantity)))
-            table.setItem(row, 7, QTableWidgetItem(product.unit))
+            table.setItem(row, 6, QTableWidgetItem(f"{profit:,.0f} VNĐ"))
+            table.setItem(row, 7, QTableWidgetItem(str(product.quantity)))
+            table.setItem(row, 8, QTableWidgetItem(product.unit))
 
         # Điều chỉnh kích thước cột
         table.resizeColumnsToContents()
+
+    def create_profit_label(self):
+        """Tạo nhãn lợi nhuận đơn vị trong form nếu chưa tồn tại"""
+        if hasattr(self.view, "groupBoxProductForm") and not hasattr(self.view, "lblProfit"):
+            self.view.lblProfit = QLabel(self.view.groupBoxProductForm)
+            self.view.lblProfit.setObjectName("lblProfit")
+            self.view.lblProfit.setStyleSheet("color: #e74c3c; font-weight: bold; font-size: 16px;")
+            self.view.gridLayout.addWidget(self.view.lblProfit, 5, 0, 1, 4)
+            self.view.lblProfit.setText("Lợi nhuận đơn vị: 0 VNĐ")
+
+    def update_profit_label(self):
+        """Cập nhật giá trị lợi nhuận đơn vị trên form"""
+        if not hasattr(self.view, "lblProfit"):
+            return
+        purchase_price = self.get_float_field("txtPurchasePrice")
+        selling_price = self.get_float_field("txtSellingPrice")
+        profit = selling_price - purchase_price
+        self.view.lblProfit.setText(f"Lợi nhuận đơn vị: {profit:,.0f} VNĐ")
 
     def show_add_form(self):
         """Hiển thị form thêm sản phẩm mới"""
@@ -252,6 +278,7 @@ class ProductController:
         self.set_text_field("txtQuantity", str(self.current_product.quantity))
         self.set_combo_field("cboUnit", self.current_product.unit)
         self.set_text_field("txtDescription", self.current_product.description)
+        self.update_profit_label()
 
         # Disable các nút
         if hasattr(self.view, "btnSave"):
@@ -281,6 +308,7 @@ class ProductController:
             self.view.btnEdit.setEnabled(False)
 
         self.current_product = None
+        self.update_profit_label()
 
     # Helper methods
     def get_text_field(self, field_name):

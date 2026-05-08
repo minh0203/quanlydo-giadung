@@ -117,6 +117,7 @@ class ImportController:
         if hasattr(self.view, "lblRemainingDebtValue"):
             self.view.lblRemainingDebtValue.setText("0 VNĐ")
         
+        self.update_average_price_display()
         self.update_import_code()
         self.display_import_items()
 
@@ -209,6 +210,7 @@ class ImportController:
         if product:
             self.selected_product = product
             QMessageBox.information(None, "Sản phẩm tìm thấy", f"Đã chọn sản phẩm: {product.name}")
+            self.update_average_price_display()
             return
 
         products = Product.search(keyword)
@@ -220,6 +222,7 @@ class ImportController:
         if len(products) == 1:
             self.selected_product = products[0]
             QMessageBox.information(None, "Sản phẩm tìm thấy", f"Đã chọn sản phẩm: {products[0].name}")
+            self.update_average_price_display()
             return
 
         dialog = QDialog(None)
@@ -246,8 +249,17 @@ class ImportController:
         if dialog.exec_() == QDialog.Accepted and selected[0]:
             self.selected_product = selected[0]
             QMessageBox.information(None, "Sản phẩm đã chọn", f"Đã chọn: {self.selected_product.name}")
+            self.update_average_price_display()
         else:
             self.selected_product = None
+
+    def update_average_price_display(self):
+        """Cập nhật hiển thị giá trung bình của sản phẩm đã chọn"""
+        if hasattr(self.view, "lblAveragePrice") and self.selected_product:
+            average_price = self.selected_product.purchase_price
+            self.view.lblAveragePrice.setText(f"Giá trung bình hiện tại: {average_price:,.0f} VNĐ")
+        elif hasattr(self.view, "lblAveragePrice"):
+            self.view.lblAveragePrice.setText("Giá trung bình hiện tại: 0 VNĐ")
 
     def add_product_to_import(self):
         if not self.selected_product:
@@ -399,9 +411,20 @@ class ImportController:
 
             for item in self.import_items:
                 product = item["product"]
-                product.quantity += item["quantity"]
-                if item["price"] > 0:
-                    product.purchase_price = item["price"]
+                
+                # Tính giá trung bình khi nhập hàng và làm tròn về đơn vị VNĐ
+                current_quantity = product.quantity
+                current_total_value = current_quantity * product.purchase_price
+                new_quantity = item["quantity"]
+                new_price = item["price"]
+                new_total_value = new_quantity * new_price
+                total_quantity = current_quantity + new_quantity
+                
+                if total_quantity > 0:
+                    average_price = (current_total_value + new_total_value) / total_quantity
+                    product.purchase_price = int(round(average_price))
+                
+                product.quantity += new_quantity
                 product.update()
 
             QMessageBox.information(None, "Thành công", f"Lưu phiếu nhập {import_order.import_number} thành công!\nTổng: {self.view.lblTotalAmount.text()}\nĐã thanh toán: {paid_amount:,.0f} VNĐ\nCòn nợ: {remaining_debt:,.0f} VNĐ")

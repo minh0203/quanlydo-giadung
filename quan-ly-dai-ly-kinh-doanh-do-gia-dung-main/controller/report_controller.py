@@ -164,7 +164,7 @@ class ReportController:
     def show_inventory_report(self):
         products = Product.get_all()
         table = self.view.tableReport
-        headers = ["Mã SP", "Tên sản phẩm", "Số lượng", "Giá vốn", "Giá bán", "Giá trị tồn kho"]
+        headers = ["Mã SP", "Tên sản phẩm", "Số lượng", "Giá vốn", "Giá bán", "Lợi nhuận đơn vị", "Tổng lợi nhuận", "Giá trị tồn kho"]
         table.setColumnCount(len(headers))
         table.setRowCount(len(products))
         table.setHorizontalHeaderLabels(headers)
@@ -172,12 +172,16 @@ class ReportController:
         total_value = 0
         for row, product in enumerate(products):
             value = product.quantity * product.purchase_price
+            profit_per_unit = product.selling_price - product.purchase_price
+            total_profit = profit_per_unit * product.quantity
             table.setItem(row, 0, QTableWidgetItem(product.product_id))
             table.setItem(row, 1, QTableWidgetItem(product.name))
             table.setItem(row, 2, QTableWidgetItem(str(product.quantity)))
             table.setItem(row, 3, QTableWidgetItem(f"{product.purchase_price:,.0f} VNĐ"))
-            table.setItem(row, 4, QTableWidgetItem(f"{product.sale_price:,.0f} VNĐ" if hasattr(product, 'sale_price') else "0 VNĐ"))
-            table.setItem(row, 5, QTableWidgetItem(f"{value:,.0f} VNĐ"))
+            table.setItem(row, 4, QTableWidgetItem(f"{product.selling_price:,.0f} VNĐ"))
+            table.setItem(row, 5, QTableWidgetItem(f"{profit_per_unit:,.0f} VNĐ"))
+            table.setItem(row, 6, QTableWidgetItem(f"{total_profit:,.0f} VNĐ"))
+            table.setItem(row, 7, QTableWidgetItem(f"{value:,.0f} VNĐ"))
             total_value += value
 
         self.update_summary(total_value, len(products), total_value / len(products) if products else 0, "--")

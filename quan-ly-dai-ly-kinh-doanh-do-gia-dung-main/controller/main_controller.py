@@ -59,13 +59,14 @@ class MainController:
             widget = QWidget()
             ui = ui_class()
             ui.setupUi(widget)
-            
+            ui.parent_widget = widget
+
             # Lưu widget
             self.modules[name] = {"widget": widget, "ui": ui, "index": index}
-            
+
             # Thêm vào stacked widget
             self.view.stacked_widget.addWidget(widget)
-            
+
             # Tạo controller
             try:
                 if name == "sale":

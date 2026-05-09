@@ -40,6 +40,7 @@ class Database:
     @classmethod
     def initialize_schema(cls):
         from .product import Product
+        from .product_category import ProductCategory
         from .customer import Customer
         from .employee import Employee
         from .order import Order
@@ -52,6 +53,7 @@ class Database:
         conn = cls.connect()
         cursor = conn.cursor()
         Product.create_table(cursor)
+        ProductCategory.create_table(cursor)
         Customer.create_table(cursor)
         Employee.create_table(cursor)
         Order.create_table(cursor)

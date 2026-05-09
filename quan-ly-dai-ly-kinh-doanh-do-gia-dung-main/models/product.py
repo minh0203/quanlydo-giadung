@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from .database import Database
+from .product_category import ProductCategory
 
 
 @dataclass
@@ -80,11 +81,7 @@ class Product:
 
     @classmethod
     def get_categories(cls):
-        rows = Database.execute(
-            "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category <> '' ORDER BY category",
-            fetch_all=True,
-        )
-        return [row[0] for row in rows]
+        return ProductCategory.get_all()
 
     @classmethod
     def get_by_id(cls, product_id):
@@ -96,14 +93,40 @@ class Product:
         return cls(*row) if row else None
 
     @classmethod
-    def search(cls, keyword):
+    def search(cls, keyword, category=None):
         keyword = f"%{keyword.lower()}%"
-        rows = Database.execute(
-            "SELECT product_id, name, category, brand, purchase_price, selling_price, quantity, unit, description, warranty_months FROM products WHERE LOWER(name) LIKE ? OR LOWER(category) LIKE ? OR LOWER(brand) LIKE ? OR product_id LIKE ? ORDER BY name",
-            (keyword, keyword, keyword, keyword),
-            fetch_all=True,
+        query = (
+            "SELECT product_id, name, category, brand, purchase_price, selling_price, quantity, unit, description, warranty_months "
+            "FROM products WHERE (LOWER(name) LIKE ? OR LOWER(category) LIKE ? OR LOWER(brand) LIKE ? OR product_id LIKE ?)"
         )
+        params = [keyword, keyword, keyword, keyword]
+        if category:
+            query += " AND category = ? COLLATE NOCASE"
+            params.append(category)
+        query += " ORDER BY name"
+        rows = Database.execute(query, tuple(params), fetch_all=True)
         return [cls(*row) for row in rows]
+
+    @classmethod
+    def update_category_name(cls, old_name, new_name):
+        if not old_name or not new_name:
+            return
+        Database.execute(
+            "UPDATE products SET category = ? WHERE category = ? COLLATE NOCASE",
+            (new_name, old_name),
+            commit=True,
+        )
+
+    @classmethod
+    def count_by_category(cls, category):
+        if not category:
+            return 0
+        row = Database.execute(
+            "SELECT COUNT(*) FROM products WHERE category = ? COLLATE NOCASE",
+            (category,),
+            fetch_one=True,
+        )
+        return row[0] if row else 0
 
     def update(self):
         Database.execute(

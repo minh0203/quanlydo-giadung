@@ -1,8 +1,122 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QPushButton, QComboBox, QTextEdit, QLabel
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QPushButton, QComboBox, QTextEdit, QLabel, QDialog, QListWidget, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt
 from models.product import Product
+from models.product_category import ProductCategory
 from models.database import Database
+
+
+class CategoryManagementDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Quản lý danh mục")
+        self.setMinimumSize(480, 500)
+
+        self.selected_category = None
+
+        self.layout = QVBoxLayout(self)
+
+        self.lblInfo = QLabel("Danh sách danh mục sản phẩm:", self)
+        self.layout.addWidget(self.lblInfo)
+
+        self.category_list = QListWidget(self)
+        self.category_list.itemSelectionChanged.connect(self.on_category_selected)
+        self.layout.addWidget(self.category_list)
+
+        self.lblCategoryName = QLabel("Tên danh mục:", self)
+        self.layout.addWidget(self.lblCategoryName)
+
+        self.txtCategoryName = QLineEdit(self)
+        self.txtCategoryName.setPlaceholderText("Nhập tên danh mục")
+        self.layout.addWidget(self.txtCategoryName)
+
+        button_layout = QHBoxLayout()
+        self.btnAddCategory = QPushButton("➕ Thêm", self)
+        self.btnUpdateCategory = QPushButton("✏️ Sửa", self)
+        self.btnDeleteCategory = QPushButton("🗑️ Xóa", self)
+        self.btnClose = QPushButton("Đóng", self)
+        button_layout.addWidget(self.btnAddCategory)
+        button_layout.addWidget(self.btnUpdateCategory)
+        button_layout.addWidget(self.btnDeleteCategory)
+        button_layout.addWidget(self.btnClose)
+        self.layout.addLayout(button_layout)
+
+        self.btnAddCategory.clicked.connect(self.add_category)
+        self.btnUpdateCategory.clicked.connect(self.update_category)
+        self.btnDeleteCategory.clicked.connect(self.delete_category)
+        self.btnClose.clicked.connect(self.accept)
+
+        self.load_categories()
+
+    def load_categories(self):
+        self.category_list.clear()
+        categories = ProductCategory.get_all()
+        self.category_list.addItems(categories)
+        if self.selected_category:
+            items = self.category_list.findItems(self.selected_category, Qt.MatchExactly)
+            if items:
+                self.category_list.setCurrentItem(items[0])
+
+    def on_category_selected(self):
+        current_item = self.category_list.currentItem()
+        self.selected_category = current_item.text() if current_item else None
+        if current_item:
+            self.txtCategoryName.setText(current_item.text())
+        else:
+            self.txtCategoryName.clear()
+
+    def add_category(self):
+        name = self.txtCategoryName.text().strip()
+        if not name:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập tên danh mục!")
+            return
+        if ProductCategory.exists(name):
+            QMessageBox.warning(self, "Cảnh báo", "Danh mục này đã tồn tại!")
+            return
+        ProductCategory.create(name)
+        QMessageBox.information(self, "Thành công", "Đã thêm danh mục mới!")
+        self.selected_category = name
+        self.load_categories()
+
+    def update_category(self):
+        if not self.selected_category:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn danh mục cần sửa!")
+            return
+        new_name = self.txtCategoryName.text().strip()
+        if not new_name:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập tên danh mục mới!")
+            return
+        if new_name == self.selected_category:
+            return
+        if ProductCategory.exists(new_name):
+            QMessageBox.warning(self, "Cảnh báo", "Danh mục mới đã tồn tại!")
+            return
+        ProductCategory.update(self.selected_category, new_name)
+        Product.update_category_name(self.selected_category, new_name)
+        QMessageBox.information(self, "Thành công", "Đã cập nhật danh mục!")
+        self.selected_category = new_name
+        self.load_categories()
+
+    def delete_category(self):
+        if not self.selected_category:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn danh mục cần xóa!")
+            return
+        count = Product.count_by_category(self.selected_category)
+        if count > 0:
+            QMessageBox.warning(self, "Cảnh báo", f"Không thể xóa danh mục này vì còn {count} sản phẩm đang sử dụng.")
+            return
+        reply = QMessageBox.question(
+            self,
+            "Xác nhận",
+            f"Bạn có chắc muốn xóa danh mục '{self.selected_category}'?",
+            QMessageBox.Yes | QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            ProductCategory.delete(self.selected_category)
+            QMessageBox.information(self, "Thành công", "Đã xóa danh mục!")
+            self.selected_category = None
+            self.txtCategoryName.clear()
+            self.load_categories()
 
 
 class ProductController:
@@ -12,7 +126,9 @@ class ProductController:
         self.view = view
         self.current_product = None
         self.setup_connections()
+        self.setup_category_management_ui()
         self.refresh_product_categories()
+        self.refresh_category_filters()
         self.create_profit_label()
         self.load_products()
 
@@ -21,6 +137,10 @@ class ProductController:
         # Kết nối nút thêm sản phẩm
         if hasattr(self.view, "btnAdd"):
             self.view.btnAdd.clicked.connect(self.show_add_form)
+
+        # Kết nối nút quản lý danh mục
+        if hasattr(self.view, "btnManageCategories"):
+            self.view.btnManageCategories.clicked.connect(self.show_category_dialog)
 
         # Kết nối nút lưu sản phẩm
         if hasattr(self.view, "btnSave"):
@@ -51,21 +171,43 @@ class ProductController:
         if hasattr(self.view, "txtSearch"):
             self.view.txtSearch.textChanged.connect(self.on_search_text_changed)
 
+        # Kết nối bộ lọc danh mục
+        if hasattr(self.view, "cboCategory"):
+            self.view.cboCategory.currentIndexChanged.connect(self.load_products)
+
         # Kết nối bảng sản phẩm
         if hasattr(self.view, "tableProducts"):
             self.view.tableProducts.itemSelectionChanged.connect(self.on_product_selected)
 
+    def setup_category_management_ui(self):
+        """Thêm nút quản lý danh mục vào giao diện nếu chưa tồn tại"""
+        if hasattr(self.view, "groupBoxSearch") and not hasattr(self.view, "btnManageCategories"):
+            self.view.btnManageCategories = QPushButton("🗂 Quản lý danh mục", self.view.groupBoxSearch)
+            self.view.btnManageCategories.setMinimumSize(160, 45)
+            self.view.searchLayout.insertWidget(self.view.searchLayout.count() - 1, self.view.btnManageCategories)
+            self.view.btnManageCategories.clicked.connect(self.show_category_dialog)
+
     def load_products(self):
         """Tải danh sách sản phẩm"""
         try:
-            products = Product.get_all()
+            keyword = self.get_text_field("txtSearch").strip()
+            category_filter = self.get_combo_field("cboCategory")
+            if category_filter == "Tất cả danh mục":
+                category_filter = ""
+
+            if keyword or category_filter:
+                products = Product.search(keyword, category_filter)
+            else:
+                products = Product.get_all()
+
             self.display_products(products)
             self.refresh_product_categories()
+            self.refresh_category_filters()
         except Exception as e:
             QMessageBox.warning(None, "Lỗi", f"Không thể tải danh sách sản phẩm: {str(e)}")
 
     def refresh_product_categories(self):
-        """Nạp lại danh sách danh mục có sẵn từ dữ liệu sản phẩm"""
+        """Nạp lại danh sách danh mục sản phẩm cho form"""
         if not hasattr(self.view, "cboProductCategory"):
             return
 
@@ -74,12 +216,7 @@ class ProductController:
         combo.blockSignals(True)
         combo.clear()
 
-        default_categories = [
-            "Tủ lạnh", "Máy giặt", "TV", "Điều hòa",
-            "Bếp từ", "Quạt", "Máy hút bụi"
-        ]
-        categories = list(dict.fromkeys(default_categories + Product.get_categories()))
-
+        categories = ProductCategory.get_all()
         for category in categories:
             combo.addItem(category)
 
@@ -91,6 +228,38 @@ class ProductController:
                 combo.setCurrentText(current)
 
         combo.blockSignals(False)
+
+    def refresh_category_filters(self):
+        """Nạp lại danh sách danh mục cho bộ lọc tìm kiếm"""
+        if not hasattr(self.view, "cboCategory"):
+            return
+
+        combo = self.view.cboCategory
+        current = combo.currentText().strip()
+        combo.blockSignals(True)
+        combo.clear()
+        combo.addItem("Tất cả danh mục")
+
+        for category in ProductCategory.get_all():
+            combo.addItem(category)
+
+        if current and current != "Tất cả danh mục":
+            index = combo.findText(current)
+            if index >= 0:
+                combo.setCurrentIndex(index)
+            else:
+                combo.setCurrentText(current)
+
+        combo.blockSignals(False)
+
+    def show_category_dialog(self):
+        """Hiển thị dialog quản lý danh mục sản phẩm"""
+        parent = getattr(self.view, 'parent_widget', None)
+        dialog = CategoryManagementDialog(parent)
+        if dialog.exec_() == QDialog.Accepted:
+            self.refresh_product_categories()
+            self.refresh_category_filters()
+            self.load_products()
 
     def display_products(self, products):
         """Hiển thị danh sách sản phẩm lên bảng"""
@@ -155,6 +324,8 @@ class ProductController:
             # Lấy dữ liệu từ form
             name = self.get_text_field("txtProductName")
             category = self.get_combo_field("cboProductCategory")
+            if category and not ProductCategory.exists(category):
+                ProductCategory.create(category)
             brand = self.get_text_field("txtBrand")
             purchase_price = self.get_float_field("txtPurchasePrice")
             selling_price = self.get_float_field("txtSellingPrice")
@@ -236,15 +407,10 @@ class ProductController:
 
     def search_products(self):
         """Tìm kiếm sản phẩm"""
-        keyword = self.get_text_field("txtSearch").strip()
-        if keyword:
-            try:
-                products = Product.search(keyword)
-                self.display_products(products)
-            except Exception as e:
-                QMessageBox.warning(None, "Lỗi", f"Không thể tìm kiếm: {str(e)}")
-        else:
+        try:
             self.load_products()
+        except Exception as e:
+            QMessageBox.warning(None, "Lỗi", f"Không thể tìm kiếm: {str(e)}")
 
     def on_search_text_changed(self):
         """Xử lý khi text tìm kiếm thay đổi"""

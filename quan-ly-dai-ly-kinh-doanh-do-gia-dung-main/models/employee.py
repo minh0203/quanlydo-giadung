@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from .database import Database
+from utils.password_utils import PasswordUtils
 
 
 @dataclass
@@ -90,7 +91,9 @@ class Employee:
         
         # Chuyển đổi string rỗng thành None cho các trường UNIQUE để tránh vi phạm constraint
         username = username if username.strip() else None
-        password = password if password else ""
+        
+        # Mã hóa mật khẩu trước khi lưu
+        hashed_password = PasswordUtils.hash_password(password) if password else ""
         
         Database.execute(
             """INSERT INTO employees 
@@ -101,13 +104,13 @@ class Employee:
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (employee_id, full_name, gender, birth_date, phone, email,
              identity_card, address, hire_date, role, base_salary,
-             commission_rate, username, password, status, note, avatar,
+             commission_rate, username, hashed_password, status, note, avatar,
              now, now),
             commit=True,
         )
         return cls(employee_id, full_name, gender, birth_date, phone, email,
                    identity_card, address, hire_date, role, base_salary,
-                   commission_rate, username if username else "", password, status, note, avatar, now, now)
+                   commission_rate, username if username else "", hashed_password, status, note, avatar, now, now)
 
     @classmethod
     def get_all(cls):
@@ -290,11 +293,12 @@ class Employee:
         """Cập nhật mật khẩu nhân viên"""
         if not new_password:
             return False
-        self.password = new_password
+        # Mã hóa mật khẩu mới trước khi lưu
+        self.password = PasswordUtils.hash_password(new_password)
         self.updated_at = datetime.now().isoformat()
         Database.execute(
             "UPDATE employees SET password = ?, updated_at = ? WHERE employee_id = ?",
-            (new_password, self.updated_at, self.employee_id),
+            (self.password, self.updated_at, self.employee_id),
             commit=True,
         )
         return True

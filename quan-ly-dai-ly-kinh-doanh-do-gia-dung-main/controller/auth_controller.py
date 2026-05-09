@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMessageBox
 from models.employee import Employee
+from utils.password_utils import PasswordUtils
 
 
 # Biến global để lưu user hiện tại
@@ -61,8 +62,8 @@ class LoginAuthController:
             QMessageBox.warning(self.view, "Lỗi", "Tài khoản không tồn tại!")
             return
         
-        # Kiểm tra mật khẩu
-        if employee.password != password:
+        # Kiểm tra mật khẩu (so sánh với mã hóa)
+        if not PasswordUtils.verify_password(password, employee.password):
             QMessageBox.warning(self.view, "Lỗi", "Mật khẩu không đúng!")
             return
         
@@ -117,6 +118,9 @@ class RegisterAuthController:
         if password != confirm:
             QMessageBox.warning(self.view, "Lỗi", "Mật khẩu xác nhận không khớp!")
             return
+        
+        # Mã hóa mật khẩu trước khi lưu
+        hashed_password = PasswordUtils.hash_password(password)
         
         QMessageBox.information(self.view, "Thành công", f"Đăng ký tài khoản '{username}' thành công!")
         self.on_cancel()

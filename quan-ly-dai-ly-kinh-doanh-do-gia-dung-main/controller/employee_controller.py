@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, QDate
 from datetime import datetime
 from models.employee import Employee
 from models.database import Database
+from utils.password_utils import PasswordUtils
 
 
 class EmployeeValidator:
@@ -265,7 +266,12 @@ class EmployeeController:
                 self.current_employee.base_salary = base_salary
                 self.current_employee.commission_rate = commission_rate
                 self.current_employee.username = username
-                self.current_employee.password = password
+                
+                # Xử lý password: nếu password mới không trống, mã hóa nó; nếu trống, giữ nguyên
+                if password and password.strip():
+                    self.current_employee.password = PasswordUtils.hash_password(password)
+                # nếu password trống, giữ nguyên mật khẩu hiện tại (đã mã hóa)
+                
                 self.current_employee.status = status
                 self.current_employee.note = note
 
